@@ -7,6 +7,7 @@ const KNOWLEDGE_STORAGE_KEY = "tessario.support.knowledgeVaultFiles.v1";
 const PRODUCT_LINK_STORAGE_KEY = "tessario.support.productLinkLibrary.v1";
 const CUSTOMER_ACCOUNTS_STORAGE_KEY = "tessario.support.customerAccounts.v1";
 const NOTIFICATIONS_STORAGE_KEY = "tessario.support.notifications.v1";
+const BACKEND_STATE_ENDPOINT = "/api/state";
 const LEGACY_STORAGE_PREFIX = ["flow", "desk"].join("");
 const LEGACY_STORAGE_KEY = `${LEGACY_STORAGE_PREFIX}.support.workspace.v11`;
 const LEGACY_TICKET_COUNTER_STORAGE_KEY = `${LEGACY_STORAGE_PREFIX}.support.lastTicketNumber.v1`;
@@ -1153,6 +1154,9 @@ workspaceConfig.tickets = alignRepeatCustomerAssignments(seedTickets);
 
 let tickets = normalizeTickets(loadTickets());
 if (ensureReceiptTestTickets(tickets)) localStorage.setItem(STORAGE_KEY, JSON.stringify(tickets));
+let backendSyncReady = false;
+let backendSyncTimer = 0;
+const backendSyncQueue = new Map();
 let lastUsedTicketNumber = loadLastUsedTicketNumber(tickets);
 let profile = loadProfile();
 let customerAccounts = loadCustomerAccounts(tickets);
@@ -1446,6 +1450,7 @@ function init() {
   applyUiState();
   updateProfileButton();
   render();
+  hydrateBackendState();
 }
 
 function applyWorkspaceBranding() {
@@ -3923,6 +3928,7 @@ function loadLastUsedTicketNumber(sourceTickets) {
 
 function persistLastUsedTicketNumber(value) {
   localStorage.setItem(TICKET_COUNTER_STORAGE_KEY, String(value));
+  scheduleBackendSync("lastTicketNumber", value);
 }
 
 function nextTicketNumber() {
@@ -4461,30 +4467,146 @@ function productLinkPlatformFromSource(source) {
 
 function persistTickets() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(tickets));
+  scheduleBackendSync("tickets", tickets);
 }
 
 function persistUsers() {
   localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+  scheduleBackendSync("users", users);
 }
 
 function persistProfile() {
   localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profile));
+  scheduleBackendSync("profile", profile);
 }
 
 function persistNotifications() {
   localStorage.setItem(NOTIFICATIONS_STORAGE_KEY, JSON.stringify(notifications));
+  scheduleBackendSync("notifications", notifications);
 }
 
 function persistKnowledgeDocs() {
   localStorage.setItem(KNOWLEDGE_STORAGE_KEY, JSON.stringify(knowledgeDocs));
+  scheduleBackendSync("knowledgeDocs", knowledgeDocs);
 }
 
 function persistProductLinks() {
   localStorage.setItem(PRODUCT_LINK_STORAGE_KEY, JSON.stringify(productLinks));
+  scheduleBackendSync("productLinks", productLinks);
 }
 
 function persistCustomerAccounts() {
   localStorage.setItem(CUSTOMER_ACCOUNTS_STORAGE_KEY, JSON.stringify(customerAccounts));
+  scheduleBackendSync("customerAccounts", customerAccounts);
+}
+
+async function hydrateBackendState() {
+  if (!window.fetch) {
+    backendSyncReady = true;
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/bootstrap", { cache: "no-store" });
+    if (!response.ok) throw new Error(`Backend bootstrap failed: ${response.status}`);
+    const payload = await response.json();
+    const state = payload?.state || {};
+    let hydrated = false;
+
+    if (hasValidTicketData(state.tickets)) {
+      tickets = normalizeTickets(state.tickets);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(tickets));
+      hydrated = true;
+    }
+    if (Array.isArray(state.users)) {
+      users = state.users.map((user) => ({ ...user, name: normalizeRepName(user.name) || user.name }));
+      localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+      hydrated = true;
+    }
+    if (isBackendPlainObject(state.profile)) {
+      profile = state.profile;
+      localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profile));
+      hydrated = true;
+    }
+    if (Array.isArray(state.notifications)) {
+      notifications = state.notifications;
+      localStorage.setItem(NOTIFICATIONS_STORAGE_KEY, JSON.stringify(notifications));
+      hydrated = true;
+    }
+    if (Array.isArray(state.knowledgeDocs)) {
+      knowledgeDocs = state.knowledgeDocs;
+      localStorage.setItem(KNOWLEDGE_STORAGE_KEY, JSON.stringify(knowledgeDocs));
+      hydrated = true;
+    }
+    if (Array.isArray(state.productLinks)) {
+      productLinks = state.productLinks;
+      localStorage.setItem(PRODUCT_LINK_STORAGE_KEY, JSON.stringify(productLinks));
+      hydrated = true;
+    }
+    if (Array.isArray(state.customerAccounts)) {
+      customerAccounts = state.customerAccounts;
+      localStorage.setItem(CUSTOMER_ACCOUNTS_STORAGE_KEY, JSON.stringify(customerAccounts));
+      hydrated = true;
+    }
+    if (Number.isInteger(state.lastTicketNumber)) {
+      lastUsedTicketNumber = Math.max(state.lastTicketNumber, highestExistingTicketNumber(tickets), MIN_TICKET_NUMBER);
+      localStorage.setItem(TICKET_COUNTER_STORAGE_KEY, String(lastUsedTicketNumber));
+      hydrated = true;
+    }
+
+    if (hydrated) {
+      selectedTicketId = selectedTicketId && tickets.some((ticket) => ticket.id === selectedTicketId)
+        ? selectedTicketId
+        : tickets[0]?.id || "";
+      applyProfilePreferences({ initialize: true });
+      render({ preserveQueueList: false, suppressQueueRowEnter: true });
+    }
+  } catch (error) {
+    console.warn("Tessario backend sync is unavailable; using browser localStorage.", error);
+  } finally {
+    backendSyncReady = true;
+    syncBackendSnapshot();
+  }
+}
+
+function syncBackendSnapshot() {
+  scheduleBackendSync("tickets", tickets);
+  scheduleBackendSync("users", users);
+  scheduleBackendSync("profile", profile);
+  scheduleBackendSync("notifications", notifications);
+  scheduleBackendSync("knowledgeDocs", knowledgeDocs);
+  scheduleBackendSync("productLinks", productLinks);
+  scheduleBackendSync("customerAccounts", customerAccounts);
+  scheduleBackendSync("lastTicketNumber", lastUsedTicketNumber);
+}
+
+function scheduleBackendSync(resource, value) {
+  if (!backendSyncReady || !window.fetch) return;
+  backendSyncQueue.set(resource, value);
+  window.clearTimeout(backendSyncTimer);
+  backendSyncTimer = window.setTimeout(flushBackendSync, 180);
+}
+
+async function flushBackendSync() {
+  if (!backendSyncQueue.size) return;
+  const updates = [...backendSyncQueue.entries()];
+  backendSyncQueue.clear();
+  await Promise.all(updates.map(async ([resource, value]) => {
+    try {
+      const response = await fetch(`${BACKEND_STATE_ENDPOINT}/${resource}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(value)
+      });
+      if (!response.ok) throw new Error(`Backend sync failed for ${resource}: ${response.status}`);
+    } catch (error) {
+      console.warn("Tessario backend sync failed.", error);
+    }
+  }));
+}
+
+function isBackendPlainObject(value) {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
 
 function accountForTicket(ticket) {

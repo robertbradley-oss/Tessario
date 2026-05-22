@@ -6,7 +6,7 @@ Tessario is a front-end prototype for a modern internal ticketing workspace. Thi
 
 The product concept is workspace-agnostic: Tessario provides the ticketing, dashboard, customer-history, assignment, macro, and assistant experience, while the iSpring model supplies the sample departments, products, policies, tickets, and support language used to demonstrate the workflow.
 
-This is currently a static mock-data prototype. It does not include backend auth, email sync, databases, order lookup, inventory lookup, or real ticket persistence beyond browser `localStorage`.
+This is currently an MVP prototype with a lightweight local backend. It includes server-side JSON persistence for demo data, but does not yet include production auth, email sync, Postgres, order lookup, inventory lookup, or real file storage.
 
 ## How To Run Locally
 
@@ -22,7 +22,20 @@ Then open:
 http://127.0.0.1:4173
 ```
 
-The app has no package install step and no build step. It is plain HTML, CSS, and JavaScript.
+The app has no package install step and no build step. It is plain HTML, CSS, JavaScript, and a no-dependency Node server.
+
+## Backend MVP
+
+`server.mjs` now serves the frontend and exposes JSON API endpoints under `/api`.
+
+- `GET /api/health`
+- `GET /api/session`
+- `GET /api/bootstrap`
+- `GET /api/state/:resource`
+- `PUT /api/state/:resource`
+- `POST /api/reset`
+
+The backend persists synced demo state to `.data/tessario-state.json`, which is intentionally ignored by Git. See `docs/backend.md` for the backend plan and next upgrades.
 
 ## How To Deploy To Vercel
 
@@ -69,7 +82,8 @@ The important deployed files are:
 - `assets/tessario-mark.svg`: Tessario icon-only mark used for the left sidebar brand mark and browser favicon.
 - `assets/tessario-logo.svg`: Full Tessario logo asset retained for product-brand treatments when needed outside the current workspace header.
 - `assets/ispring-logo.png`: Active iSpring workspace logo used in the top header.
-- `server.mjs`: Minimal Node static server for local preview.
+- `server.mjs`: Node server for static hosting and MVP JSON API persistence.
+- `docs/backend.md`: Backend MVP notes and next upgrade path.
 - `.vercel/`: Vercel project metadata, if linked locally.
 
 ## Main Features
@@ -81,17 +95,18 @@ The important deployed files are:
 - Knowledge Vault prototype for tracking approved source files that future assistant workflows can use.
 - Admin tools for assignment pool management, rep settings, workspace configuration, and mock routing controls.
 - iSpring model data including sample products, support macros, customer tickets, warranty/receipt context, and guardrails.
-- Static local prototype with browser `localStorage` persistence for demo data.
+- Static frontend with localStorage fallback and backend JSON persistence for demo data.
 
 ## Known Issues
 
-- No real backend, database, auth, email ingestion, or role permissions yet.
-- `localStorage` is used for persistence. The app now validates the saved mock-ticket schema and reseeds default data when stale data is detected.
+- Backend persistence currently uses a local JSON file rather than Postgres.
+- Auth, email ingestion, file storage, and role permissions are not production-ready yet.
+- `localStorage` remains as a browser fallback. The app validates the saved mock-ticket schema and reseeds default data when stale data is detected.
 - Attachment previews use mock inline/modal rendering until real backend file storage and downloads exist.
 - Copy actions use `navigator.clipboard` and may silently do nothing if the browser blocks clipboard access.
 - The app is optimized for desktop. Smaller screens are not the current priority.
 - Next Best Step guidance is rule/mock-data based. AI Assignment is currently mock fair-routing logic, not a real AI service.
-- Vercel deployment should serve static files, but `server.mjs` is local-only.
+- Vercel deployment should serve static files unless a server/runtime deployment path is configured.
 
 ## Next Planned Upgrades
 
@@ -101,6 +116,9 @@ The important deployed files are:
 - Add saved custom views and visible column preferences.
 - Add richer AI routing rules for specialized queues, PTO/coverage, language skills, product specialization, and manager overrides.
 - Add admin audit history for assignment pool changes.
+- Replace JSON-file persistence with Postgres and normalized ticket/customer/message tables.
+- Add real auth, role checks, and organization/workspace membership.
+- Add real file storage and document text extraction for Knowledge Vault sources.
 - Add a real macro drawer with categories, favorites, previews, and personal/team/admin macro types.
 - Add better attachment preview modals for photos and PDFs.
 - Expand the Dashboard with richer manager views for workload forecasting, SLA breach causes, oldest tickets, and escalation coaching.

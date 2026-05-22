@@ -1,0 +1,11 @@
+{
+  "name": "tessario-ispring-model",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "scripts": {
+    "dev": "node server.mjs",
+    "start": "node server.mjs",
+    "smoke": "node scripts/backend-smoke.mjs"
+  }
+}
