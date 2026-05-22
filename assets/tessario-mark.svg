@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">Tessario mark</title>
+  <defs>
+    <linearGradient id="topLeft" x1="90" x2="270" y1="148" y2="148" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#17C8F9"/>
+      <stop offset="1" stop-color="#1577F6"/>
+    </linearGradient>
+    <linearGradient id="topRight" x1="286" x2="438" y1="148" y2="148" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1569F3"/>
+      <stop offset="1" stop-color="#2859F6"/>
+    </linearGradient>
+    <linearGradient id="stemLeft" x1="228" x2="332" y1="196" y2="380" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#149DF8"/>
+      <stop offset="0.56" stop-color="#1669E8"/>
+      <stop offset="1" stop-color="#3A19D8"/>
+    </linearGradient>
+    <linearGradient id="stemRight" x1="300" x2="388" y1="208" y2="398" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#084DC6"/>
+      <stop offset="0.55" stop-color="#1E5EF5"/>
+      <stop offset="1" stop-color="#4611D2"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#topLeft)" d="M139 104h149l-54 72H85c-18 0-26-20-14-33l50-53c5-6 11-9 18-9z"/>
+  <path fill="url(#topRight)" d="M303 104h145c17 0 24 20 12 32l-39 40H249l40-56c4-6 9-16 14-16z"/>
+  <path fill="url(#stemLeft)" d="M248 176 167 258c-6 6-9 13-9 21v116c0 16 19 24 30 12l105-108z"/>
+  <path fill="url(#stemRight)" d="M255 176v246c0 16 19 24 30 12l66-69c5-5 8-12 8-20v-91c0-7-3-14-8-19z"/>
+  <path fill="#073BAF" opacity=".72" d="m255 176 96 59c5 5 8 12 8 19v5L255 331z"/>
+  <path fill="#3D16D8" opacity=".74" d="m255 331 104-72v86c0 8-3 15-8 20l-66 69c-11 12-30 4-30-12z"/>
+</svg>

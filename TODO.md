@@ -1,0 +1,629 @@
+# TODO
+
+## Completed Items
+
+- Fixed Profile Settings modal sizing so Account, Preferences, Signature, Notifications, Assist, and Workspace tabs keep the same bounded dialog width/height, with header, tabs, and Save/Close footer stable while only the tab content pane scrolls when needed.
+- Added a persistent smooth sliding active-tab bubble to Profile Settings using Tessario's shared motion variables, with first-render positioning that avoids a corner-origin jump and reduced-motion fallback through the existing motion safety rules.
+- Fixed Admin, Dashboard, and Knowledge Vault scrolling by making the reusable full-page panels stretch to the app shell's available content height and own their vertical overflow.
+- Scroll root cause: the app shell and `.ticket-workspace` were fixed-height with overflow clipped, but `.ticket-workspace` aligned active grid items to the start. Queue and Ticket Detail still scrolled because their table/thread regions had explicit constrained scrollers; Admin and Dashboard were auto-height panels, so their overflow was clipped by the parent instead of becoming scrollable.
+- Preserved the fixed left sidebar, existing Ticket Detail conversation scrolling, queue table pagination/scrolling, and footer placement at the bottom of each content scroller.
+- Fixed Ticket Detail opening so it scrolls to the most recent customer/rep message in the conversation thread instead of the reply composer, with trailing system events ignored for the scroll target.
+- Added realistic deterministic receipt records for mock tickets/customer profiles using Amazon, iSpring direct, Home Depot, Lowe's, and Walmart sources with customer email, order, model, purchase/upload dates, assigned-rep uploader, and warranty registration fields.
+- Updated Customer History Receipts & Warranty so mock receipt records appear consistently and uploader names follow the ticket's assigned rep instead of defaulting to CS14 Robert.
+- Reworked View Receipt into a polished source-specific receipt preview with support test labeling, order/customer/model/date/total details, Close, Copy receipt info, and Download/open mock file actions.
+- Fixed collapsed left-sidebar labels/tooltips with a body-level high-z-index tooltip portal positioned to the right of centered collapsed icons so labels are not clipped behind the main app.
+- Browser-verified latest-message ticket opening, Customer History receipt display, receipt preview actions/layout, collapsed sidebar tooltip layering, and local console stability.
+- Fixed the workspace footer so it is no longer part of an always-visible viewport row; the copyright now appears at the bottom of scrollable content only.
+- Added queue pagination for Open, Assigned To Me, and Closed ticket tabs with 50 tickets per page, Showing count text, Page buttons, and Previous/Next controls.
+- Kept queue search/filtering applied to the full selected view before pagination, with page reset on search and tab changes.
+- Updated page changes to clear current-page bulk selection and move the right preview panel to the first ticket on the new page.
+- Browser-verified footer visibility, queue pagination, search reset behavior, page-to-preview updates, current-page selection clearing, and local console stability.
+- Fixed Customer History View receipt so it opens a receipt preview modal instead of doing nothing/showing only a toast.
+- Added a shared receipt preview flow used by Customer History receipts and Ticket Detail receipt attachments.
+- Receipt previews now show PDF-style or image/screenshot-style mock viewers with file name, purchase source, order number, model, customer name/email, purchase date, receipt total, uploaded date, and uploader details.
+- Added receipt preview actions for Download/open mock file, Copy receipt info, and Close.
+- Added 20 deterministic receipt test tickets/customer records with unique Amazon, iSpring direct, Home Depot, Lowe's, and Walmart receipt examples.
+- Added startup migration for existing local demo data so the new receipt test tickets and customer receipt records appear without a manual reset.
+- Redesigned the Merge toolbar button with a polished centered branching icon, "Merge tickets" tooltip, disabled state until two tickets are selected, and matched toolbar hover/press states.
+- Browser-verified PDF receipt preview, image receipt preview, Ticket Detail receipt attachment preview, Copy receipt info, Merge disabled/enabled behavior, Merge modal opening, and no local app console errors.
+- Reworked the Tessario app shell so the body/document no longer scrolls during ticket work; the left sidebar stays fixed on screen and the workspace footer remains visible.
+- Fixed Open Tickets so only the center queue table scrolls while the left sidebar and selected-ticket preview panel stay in place.
+- Fixed Ticket Detail so only the center conversation and reply composer area scrolls while the left sidebar and right ticket tools panel stay in place.
+- Updated ticket-detail scroll helpers, latest-message/composer jumps, and the floating Reply button to use the internal conversation scroll area instead of `window` scrolling.
+- Browser-verified queue table scrolling, ticket conversation scrolling, reply composer reachability, fixed side panels, sidebar collapse behavior, and no local app console errors.
+- Replaced the Merge toolbar icon with a clearer osTicket-style branching merge glyph in Tessario's existing toolbar button style.
+- Updated the Merge button tooltip and accessible label to the clean label "Merge" while preserving the selected-ticket checks, bulk-action behavior, and merge confirmation modal.
+- Fixed Ticket Detail and Open Tickets scroll behavior by removing nested fixed-height/overflow locks from the workspace, ticket panels, conversation area, queue table wrapper, preview rail, and context rail.
+- Ticket Detail now has one clear page-level scroll path: opening a ticket starts at the top briefly, then smoothly scrolls to the reply composer; the conversation thread and composer remain reachable with normal page scrolling.
+- Open Tickets now scrolls normally with the page; the selected-ticket preview no longer uses a sticky footer or internal vertical scroll that makes the right panel feel fixed while the table moves.
+- Scroll root cause: the workspace grid middle row and active ticket surfaces were built as nested internal scroll containers, including `overflow: hidden`, `height: 100%`, `overflow-y: auto`, and sticky preview behavior. Those rules trapped scroll inside the table/thread panels and made the app shell, sidebar, preview, and composer feel disconnected.
+- Browser-verified ticket open, smooth composer landing, composer typing, Back to queue, queue page scrolling, reopening from a scrolled queue position, detail thread/composer scrolling, and console stability locally.
+- Replaced the ticket queue Merge toolbar icon with a cleaner modern merge glyph showing two branches combining into one arrow.
+- Updated the Merge toolbar tooltip to show "Select at least two tickets to merge" until two rows are selected, then "Merge tickets."
+- Preserved the existing Merge button sizing, padding, border radius, hover/click states, selected-ticket behavior, and merge confirmation modal.
+- Simplified Customer History receipt cards so they show only receipt file name, model, order number, purchase source, Uploaded/Verified receipt status, Registered/Not registered warranty status, uploaded by/date, and registered by/date.
+- Removed Customer History receipt-card Needs review/confidence badges, confidence fields, AI confidence wording, and extraction review notes while keeping internal metadata available for future use.
+- Preserved Customer History receipt actions for View receipt, Edit details, Mark receipt verified, Register/Unregister warranty, and Apply to current ticket.
+- Removed the unused selected-count queue-toolbar pill so no placeholder bulk-action text appears when rows are not checked.
+- Let the queue search field use the freed toolbar space while keeping Status, Assign, Merge, Copy, Refresh, Sort, and Reset aligned as one clean right-side control row.
+- Redesigned Merge tickets, Copy ticket link, and Refresh queue as consistent 36px Tessario icon buttons with modern inline icons, exact tooltips, and polished hover/click states.
+- Changed the copyright footer so it is not fixed, sticky, or always visible at the bottom of the viewport; it appears after scrolling to the bottom of the app content.
+- Added a subtle centered footer copyright label: "Copyright © 2026 Tessario, LLC. All Rights Reserved."
+- Placed the copyright footer in the main workspace shell as a small muted row beneath the active app page without crowding queue, detail, dashboard, admin, Knowledge Vault, customer history, or Tessario Assist surfaces.
+- Redesigned Ticket Detail as a modern, compact osTicket-inspired Tessario page while keeping the chat-style thread bubbles.
+- Added a collapsible Ticket Details panel under the header for order, channel, model, purchase source, receipt, warranty, created, last response, and last updated values without letting the metadata dominate the screen.
+- Polished the thread structure with left-aligned customer messages, right-aligned rep replies, amber internal notes, centered timeline chips, and inline attachment preview/file cards inside the related message.
+- Added ticket status control to the reply composer bottom area near signature choices while preserving Reply/Internal Note tabs, support mailbox sender, recipients, canned response dropdown, formatting toolbar, drop zone, Save Draft, Attach, and Send Reply/Add Note behavior.
+- Simplified the Ticket Detail right sidebar to Tessario Assist, Customer Snapshot, Macros, Product Link, collapsed Order/Warranty, and collapsed Diagnostics.
+- Adjusted Ticket Detail opening scroll so it starts at the top briefly and then smoothly lands on the latest thread message/reply area instead of abruptly jumping to the composer.
+- Browser-verified Ticket Detail opening, Ticket Details expansion, composer tab/editor behavior, right sidebar structure, and console stability locally.
+- Added a compact modern osTicket-style Tickets/Open toolbar while keeping Tessario styling, the sidebar, iSpring workspace header, global search, Open / Assigned To Me / Closed tabs, and the right preview panel.
+- Added Status, Assign, Merge, Copy link, Refresh, and Sort toolbar actions above the queue table.
+- Wired Status to the supported Tessario statuses only: Open, Closed, and Closed, Waiting On Response, plus optional saved-view filters for Follow up, Needs receipt, Customer replied, and Overdue.
+- Wired Assign to Claim, CS-only rep assignment options, and a team-assignment placeholder toast, and added the mock Merge confirmation flow with primary-ticket selection, selected ticket numbers, optional internal note, and merge-review timeline events.
+- Tightened queue table density while preserving full Ticket # and Last Updated labels, readable Subject / From / Assigned To / Status columns, dropdown close behavior, close-row animation, ticket detail opening, customer history, New Ticket, Tessario Assist, and console stability.
+- Fixed ticket table column sizing after the grid/list row animation change so Ticket # and Last Updated have readable fixed widths, email count stays compact, Subject keeps the most flexible space, and From / Assigned To / Status remain readable.
+- Kept the animatable grid/list row close structure intact while aligning header and row grid columns from the same `--queue-table-columns` definition and limiting ellipsis to long Subject and From/customer text.
+- Browser-verified Open, Closed, and Assigned To Me rows show full ticket numbers and full date/time labels, confirmed the close-row collapse animation still applies, and confirmed no console errors locally.
+- Replaced native animated ticket table body rows with CSS grid/list row wrappers that preserve the same queue table design, columns, sticky-looking header treatment, selection behavior, and row interactions.
+- Close/removal root cause final fix: native table-row layout was still controlling the visible row reflow, so lower rows could snap upward even after the previous FLIP attempt. The ticket body is now block/grid based, making wrapper height collapse animatable without table layout fighting the motion.
+- Updated close removal so the row wrapper locks to its measured height, row content uses the existing bubble pop/fade timing, the wrapper collapses with shared Tessario 820ms row timing, and the ticket is not committed/removed from the visible queue until the collapse completes.
+- Verified single close, bulk close, Closed-tab persistence, no native queue body `<tr>` rows, no `display: table-row`, no `transition: all`, and no browser console errors locally.
+- Reworked ticket close row-fill movement with a FLIP-style animation: sibling rows are measured before collapse, the closing shell is collapsed to its final layout position, surviving rows are inverted with `translate3d`, and their transforms play back to zero using shared Tessario row-fill timing.
+- Close-row movement root cause: the closing row's bubble pop/fade was already smooth, but rows below still relied on native table-row reflow during height collapse. That left sibling rows vulnerable to a delayed layout catch-up and visible upward snap when the closed ticket left the Open queue.
+- Kept the close flow scoped: stable ticket-id row keys, no whole-table remount during close, no ticket data reload/reseed/refilter during the animation, transform-only sibling movement, reduced-motion support, bulk close degradation, and Closed-tab persistence.
+- Reworked ticket close/removal into a measured bubble-pop collapse with a 140ms pop, 340ms fade/scale-down, 180ms collapse start, and 820ms height/fill movement.
+- Close-removal root cause: the previous path hid the real row and separately transformed the remaining rows, so the row could visually disappear before the table layout finished closing the gap. The new path keeps the real row mounted, wraps its cells for controlled collapse, uses FLIP transforms to move sibling rows upward smoothly, and removes/commits only after the full close sequence completes.
+- Fixed close-row timing so the closing row remains in the table until the full close/pop/fade plus row-fill animation completes.
+- Close-animation root cause: the status commit waited for the full animation, but the real table row was removed after the early collapse delay, making the surrounding rows move before the full close sequence finished. The fix keeps an invisible placeholder row in place and moves following rows upward over the 760ms collapse/fill timing while the closing overlay fades.
+- Removed app-level Grammarly exposure and hardened editable fields by adding `spellcheck="false"`, `data-gramm="false"`, and related Grammarly opt-out attributes to rendered text-entry fields, plus cleanup for Grammarly-specific injected nodes.
+- Cursor root cause: source search found no app rules for white/transparent carets, transparent editable text, hidden cursors, `mix-blend-mode`, or Grammarly scripts. The remaining app-side issue was missing Grammarly opt-out attributes on dynamically rendered editors and pointer-control specificity that let broad input text-cursor rules win for input-like controls. Editable fields now force dark text/caret, and buttons/links/input controls force pointer where appropriate.
+- Simplified Customer History profile and receipt/warranty cards so account summary shows only high-value customer counts, each receipt carries its own warranty status, receipt actions stay on the same card, and uploaded-by defaults to the assigned rep on the source ticket.
+- Cleaned up the right queue preview purchase-source display so it shows full values, uses `iSpring Website` for the preview-facing iSpring source label, removes `Detected by AI` copy from the preview panel, and shows unconfirmed AI-detected sources as `Source / Not Registered`.
+- Allowed the preview purchase-source row to wrap cleanly instead of truncating, so longer values stay readable in the right panel.
+- Polished the top-right action cluster with consistent 38px controls, a sleek Assist launcher, a clean primary New button, a refined notification bell/count badge, and an aligned CS profile control without changing the existing click behavior.
+- Force-fixed disappearing/white cursor behavior in typeable fields by adding the requested final global override with explicit `cursor: text !important`, `caret-color: #061432 !important`, and `color: #061432 !important` for inputs, textareas, contenteditable fields, reply/composer areas, modal fields, and search inputs.
+- Cursor root cause: the shared pointer-control CSS included a broad `label` cursor rule, and the global search label had absolutely positioned `span`/`kbd` adornments over the input without `pointer-events: none`, causing hover hit-testing to land on the label adornment instead of the editable field. The prior final layer also used `var(--tessario-text)` rather than the requested hard color and missed several semantic composer/modal selectors.
+- Confirmed there were no project rules for `cursor: none`, `caret-color: white`, `caret-color: transparent`, editable-field `color: transparent`, `mix-blend-mode`, or browser-extension CSS.
+- Fixed Tessario AI receipt behavior so attachment/customer-account detections are review-only instead of confirmed data mutations.
+- Root cause: AI attachment detection reused the same `purchaseSource` mutation path as rep confirmation, and saved customer-account history automatically flipped ticket receipt/warranty fields when tickets rendered.
+- Split detected purchase-source state from confirmed purchase-source state, added "Detected by AI / Needs rep review" display labels, and kept receipt save/apply/verify plus warranty register/unregister as rep-only actions.
+- Added a final cursor/caret safety layer for true typeable fields across reply composer, internal notes, queue/global search, Create Ticket, customer notes, receipt details, profile/settings, Knowledge Vault, and Tessario Assist.
+- Cursor root cause: later shared form styling and custom-control layers could override earlier editable-field cursor/color rules; the final layer restores dark text, dark caret color, text cursor for inputs/textareas, default body cursor, pointer controls, and not-allowed disabled fields.
+- Simplified the Create Ticket modal to required customer name, customer email, subject, and message/reason fields, with phone, model number, order number, purchase source, and issue type inside an Advanced details disclosure.
+- Updated manual Create Ticket behavior so outbound-first tickets are assigned to the creating rep, receive the timeline event "CS14 Robert created this ticket manually." for the default admin user, and no longer show random-assignment guidance in the modal.
+- Added front-end/mock customer notification preparation for manual tickets: the generated `support@ispringfilters.com` email is added as an outbound thread message, "Customer notification email generated." is written to the timeline, and the success toast says "Ticket created and customer notification prepared."
+- Re-hardened cursor/caret visibility across typeable fields, including reply/internal notes, queue/global search, create-ticket fields, customer/account notes, receipt details, settings/profile fields, and Tessario Assist, while keeping body/default cursors normal and clickable controls as pointers.
+- Redesigned the Ticket Detail status and assigned-rep dropdowns into matching Tessario select controls with consistent height, borders, hover/focus styling, aligned chevrons, unclipped CS-first-name rep labels, and higher menu stacking.
+- Rebuilt canned responses into daily iSpring support macros across Warranty / Receipt, Replacement Parts, RO Troubleshooting, Tankless RO, Whole House, Returns, Reviews, and Water Tests.
+- Fixed macro insertion so selecting a canned response preserves the ticket-detail scroll position, keeps the reply composer stable, focuses the reply editor, and places the caret at the end of the inserted text.
+- Removed automatic rep-reply status closing so only manual rep status actions change status, except the automatic customer-reply reopen rule.
+- Updated customer reply reopen behavior so Closed and Closed, Waiting On Response tickets move to Open and log "Customer replied; ticket reopened."
+- Added visible inline thread attachment previews/cards for image/photo attachments and PDF/file attachments, plus a mock preview/download modal.
+- Expanded seeded mock data to hundreds of realistic iSpring tickets with repeat customers, long threads, receipt/order attachments, install/damage photos, water-test PDFs, closed/reopened/waiting cases, and cleaner repeat-customer rep assignment consistency.
+- Hardened cursor/caret styling across editable fields so text areas, inputs, notes, search, modal forms, receipt fields, and customer notes keep visible text cursors and dark carets.
+- Reworked internal rep display naming to CS-first-name format everywhere visible in Tessario, with legacy localStorage normalization for previous full-name rep values.
+- Kept customer-visible reply signatures on first-name signoff while preventing rep last names from appearing in queue, detail, admin, dashboard, notifications, customer history, assignment, and macro surfaces.
+- Restricted verified purchase-source detection to receipt/order-proof attachments and saved receipt history; text-only clues now become Unverified mention or Not verified rather than verified sources.
+- Added Ticket Detail composer attachment scanning for receipt PDFs, order screenshots/images, photos, and PDFs, with source extraction from attachment metadata/file names when possible.
+- Added attachment timeline outcomes for purchase source scans: detected source from attachment, or purchase source needs review when metadata is insufficient.
+- Replaced the Ticket Detail back control with a cleaner 38px rounded SaaS icon button and widened the assigned-rep dropdown for CS-first-name labels.
+- Enlarged the Ticket Detail Back to queue icon button to a polished 38px square click target with the "Back to queue" tooltip.
+- Fixed Ticket Detail open behavior so tickets start at the top of the thread, then smoothly scroll to the reply composer, with reduced-motion users getting a non-smooth path.
+- Replaced the cut-off Daily replies macro preview with a full selected-macro preview in a scrollable right-rail text area while keeping Insert into reply and Copy visible.
+- Updated Product Link display to show the actual stored Product Link Library URL, show "No saved link found." when missing, and keep Copy link plus Insert into reply visible.
+- Reworked System and Tessario AI thread events into subtle centered timeline chips with small icons and muted text while preserving customer/rep/internal-note message bubbles.
+- Browser-verified Ticket Detail opening, right-rail macro/product-link visibility, quiet timeline chip styling, and console stability locally.
+- Replaced the Ticket Detail Back to queue text button with a compact left-arrow icon button and exact "Back to queue" tooltip while preserving the fast cached queue-return path.
+- Redesigned ticket-thread timeline rows into polished audit events with distinct styling and icons for System, Tessario AI, assignment, status changes, receipt/warranty updates, and attachment activity.
+- Simplified the Ticket Detail right sidebar default stack to Tessario Assist, Customer Snapshot, Macros, and Product Link only.
+- Moved Next Best Step, Order / Warranty, extra customer details, source/warranty metadata, attachments, checklist, guardrails, manager context, and similar tickets into collapsed right-rail sections.
+- Shortened the visible Customer Snapshot, macro preview, and Product Link cards and removed duplicate receipt/warranty/source details from the default right panel.
+- Browser-verified Back to queue, ticket-mode Tessario Assist launch, Customer History, macro insert, product-link insert, Order/Warranty expansion, and console stability after the Ticket Detail polish pass.
+- Fixed laggy Back to queue animation from Ticket Detail.
+- Root cause: Back to queue was using the full app render path, which revalidated persisted ticket state, refiltered/resorted visible tickets, rebuilt the whole table with `innerHTML`, replayed row-enter animations across every visible row, and paired that work with layout-heavy workspace grid animation.
+- Kept the queue table and visible-ticket list in memory while Ticket Detail is open, made Back to queue switch only view state, and refreshed preview/selection state without remounting the table.
+- Moved the queue/detail screen transition to the main workspace container using shared Tessario opacity/transform motion, suppressed per-row enter animations on return, avoided `transition: all`, and preserved reduced-motion support.
+- Slowed the ticket close/removal animation with shared Tessario motion variables: about 280ms pop, 760ms fade, and 800ms row collapse/fill.
+- Kept the existing overlay-clone and transform-based row-fill close path so closing starts immediately, rows glide up smoothly, the table avoids a full remount, and closed tickets still appear in the Closed tab.
+- Updated JavaScript timing fallbacks to match the shared CSS close-row timing while preserving reduced-motion behavior.
+- Split queue row visual states so clicking a row updates the right preview panel without applying the blue checked-row background.
+- Moved the blue selected-row styling to checked checkbox rows only, and unchecking removes the bulk-action highlight.
+- Added a subtle previewed-row marker that is visually separate from hover and checked-row styling while preserving ticket opening paths.
+- Restored the right selected-ticket preview panel on the queue screen while keeping the table balanced beside it.
+- Removed the latest email/message body preview from the preview panel so it shows only ticket number, status, subject, customer/contact, assignment, model/order, purchase source, receipt, warranty, last updated, and Open ticket.
+- Preserved the main Closed tab without a count badge while keeping Closed date-range dropdown counts.
+- Removed the main Closed tab count badge while keeping Open and Assigned To Me count badges.
+- Kept Closed-tab date range counts in the dropdown for Today, Yesterday, This Week, and This Month.
+- Removed the right selected-ticket preview panel from the queue screen and restored the queue table to a single full-width queue surface.
+- Kept queue row, ticket-number, and subject clicks opening Ticket Detail, with customer links still opening Customer History.
+- Simplified ticket row styling so Open, Assigned To Me, and Closed rows share the same base table treatment, with no unread dots, no customer-reply subject bolding, and no closed-row subject muting.
+- Fixed queue Subject column visibility across Open and Closed tabs by reallocating table width priority to Subject, hardening the subject text wrapper for ellipsis, and keeping unread dots in a separate non-overlapping grid slot.
+- Redesigned the top-right action cluster into a compact 36px SaaS control set with a lighter Tessario Assist launcher, slimmer primary New action, line-style notification bell, small unread dot, and avatar-only profile/settings control.
+- Kept the existing top-bar behaviors wired: Tessario Assist opens global Assist, New opens the New Ticket modal, the bell opens notifications, and the avatar opens profile/settings.
+- Improved Manager View so Team Workload appears directly under Manager Priority before Needs Action.
+- Expanded Manager View Team Workload with per-rep active tickets, assigned today, customer replies waiting, overdue tickets, SLA due soon, closed today, oldest open ticket age, assignment eligibility, and Good / Watch / Behind risk.
+- Added clean workload risk indicators with amber Watch and red Behind states for reps with overdue tickets, high customer replies waiting, due-soon pressure, or old open work.
+- Added Manager View row actions for View rep tickets, View overdue, and Rebalance, with ticket actions filtering the queue and Rebalance using MVP toast feedback.
+- Kept Rep View privacy-safe by not exposing the full team workload/risk table there.
+- Fixed queue subject visibility across Open, Assigned To Me, and Closed tabs by making the subject cell explicitly control width, readable color, and ellipsis truncation.
+- Preserved clear open/unanswered ticket emphasis with stronger subject weight, blue unread dot, and row accent while keeping Closed and Closed, Waiting On Response subjects calmer but still readable.
+- Fixed the Open / Assigned To Me / Closed tab animation so the active bubble persists and slides between tab positions instead of remounting from the upper-left corner on every tab click.
+- Added Manager View and Rep View to the Dashboard.
+- Kept CS14 Robert/admin on a switchable dashboard with Manager View as "Tessario command center" and Rep View as "My support dashboard."
+- Added Rep View priority cards for my open tickets, customer replies waiting on me, my overdue tickets, my SLA due soon, and my receipt/warranty review needed.
+- Added a My Needs Action table for reps with Ticket #, Subject, Customer, Reason, Last updated, and Action columns, intentionally omitting other-rep assignment details.
+- Added aggregate-only Team Trends to Rep View for created/closed volume, product families, issue types, common models, and channels/sources without exposing individual workload comparisons.
+- Expanded Manager View with all needs-action tickets, SLA/response health, stuck/at-risk tickets, team-level trends, and detailed rep workload metrics.
+- Replaced the separate Closed date-range pills with one Closed-tab-only dropdown for Today, Yesterday, This Week, and This Month, with counts in the option labels.
+- Renamed Waiting On Response to Closed, Waiting On Response across status display and controls.
+- Moved Closed, Waiting On Response tickets into the Closed tab and kept them out of Open, Assigned To Me, active workload, and unread/needs-response styling.
+- Added automatic reopening for Closed, Waiting On Response tickets when a newer customer reply appears after the waiting state.
+- Made Open tickets needing rep response much easier to identify with a blue unread dot, left row accent, subtle row tint, and stronger subject weight.
+- Simplified the Dashboard into a cleaner Tessario command center with the requested title, iSpring support subtitle, and Refresh action.
+- Removed the blank white queue-preview pill that appeared under the top header on Dashboard by hiding queue preview on Dashboard, Admin, and Knowledge Vault screens.
+- Removed the always-visible Dashboard filter row and cut Today's Priority down to four action cards: customer replies waiting, overdue tickets, SLA due soon, and receipt/warranty review needed.
+- Kept Dashboard Needs Action as the main table and simplified Team Workload to rep name, active tickets, customer replies waiting, and overdue.
+- Moved product trends, issue trends, channel/source trends, created-vs-closed, and recent activity into a collapsed More insights section.
+- Polished ticket queue tab counts so Open shows the total active count across all reps, Assigned To Me keeps the current user's active count, and Closed shows the total closed count.
+- Replaced the Closed-tab date dropdown with compact Today, Yesterday, This Week, and This Month count pills based on each ticket's closed date.
+- Simplified the right ticket preview panel by removing Change status, Reassign, Customer history, and the SLA header pill while keeping the requested summary fields.
+- Restyled the preview action as a cleaner full-width Tessario "Open ticket" button with lighter sizing and polished hover/click motion.
+- Completely redesigned the Tessario Dashboard into a support command center led by Today's Priority action cards, Needs Action, role-aware workload, compact trend widgets, Trending Issues, Stuck / At Risk, and Recent important activity.
+- Added dashboard priority cards for customer replies waiting, overdue tickets, SLA due soon, unassigned tickets, escalated tickets, and receipt/warranty review needed, with links into matching ticket queue searches.
+- Reworked the Needs Action table to show Ticket #, subject, customer, assigned rep, reason, last updated, and a Work ticket action.
+- Added admin/team workload with rep active tickets, customer replies waiting, overdue, closed today, and assignment eligibility, while normal reps see My Workload and assigned needs-action tickets first.
+- Replaced the large dashboard line chart with smaller widgets for created vs closed this week, issue type, product family, purchase source, and common models.
+- Added Trending Issues for RO500AK beeping/reset, WCS45KG startup/brine tank, RCC7P-AK tank pressure, warranty missing receipt, Amazon damaged shipment, and WGB32B pressure drop.
+- Added Stuck / At Risk and Recent important activity sections that focus on escalations, customer replies, closed tickets, receipt uploads, warranty registration, reassignment, SLA breaches, reopened/old tickets, long threads, and frustrated tone.
+- Changed the closed-ticket removal from a slide-right exit to a polished bubble-pop motion: scale up to `1.015`, then scale down to `0.96` while fading out.
+- Retimed close-row removal to 140ms pop, 260ms scale/fade exit, 180ms delayed collapse start, and 400ms collapse/fill movement, while preserving single close, bulk close, reduced-motion behavior, and Closed-tab persistence.
+- Slowed the closed-ticket row removal timing to a calmer 700ms slide/fade, 180ms delayed collapse start, and 500ms collapse/fill so the row visibly exits before the table closes the gap.
+- Reconnected the close-row sequencing to the shared collapse-duration token so the Closed status commit and visible cleanup wait until the full row exit finishes.
+- Diagnosed and fixed the two remaining laggy animation paths: sidebar collapse/expand and closed-ticket row removal.
+- Sidebar root cause: the visible motion was tied to layout animation (`grid-template-columns` and padding), active-indicator width/height transitions, and active-item measurement during motion; the fix stages label fade first, glides the workspace with transform, defers indicator measurement until the end, and keeps the indicator transform/opacity-only.
+- Closed-row root cause: the exit path animated table-row height plus cell padding/line-height and waited too long before moving the remaining rows; the fix uses a fixed overlay clone for the slide/fade, removes the real row after the exit begins, and moves remaining rows with a transform-only FLIP pass before committing Closed status.
+- Confirmed close status/list updates happen after the visual exit, the table does not remount during normal close removal, ticket IDs remain stable row keys via `data-ticket-id`, and closed tickets still appear in the Closed tab.
+- Added the Waiting On Response workflow status alongside Open and Closed across queue display, ticket detail status controls, bulk status changes, create-ticket status, and dashboard filters.
+- Normalized legacy/mock statuses into the new visible status model: Waiting Customer becomes Waiting On Response, Closed/Resolved become Closed, and other active legacy states display as Open.
+- Updated queue subject bolding so only tickets whose latest email-style message is from the customer appear bold; rep replies, system activity, internal notes, Waiting On Response, and Closed tickets stay normal weight.
+- Removed the Open Tickets Show Filters button while preserving the main queue search and keeping existing queue controls stable.
+- Added a Closed-tab-only date range dropdown with Today, Yesterday, This Week, and This Month, using Tessario custom-select styling and motion and defaulting to This Week for the current mock data.
+- Browser-verified Open, Assigned To Me, and Closed tabs, Closed date filtering, three-option status dropdowns, subject response styling, and console stability.
+- Refined close-ticket queue removal into a combined slide-right, fade-out, and soft height-collapse animation.
+- Started close-row height collapse after 120ms and kept the 340ms collapse/fill timing on shared motion variables.
+- Kept closing rows in the visible table until the combined exit completes, then committed status/count updates and preserved Closed-tab visibility.
+- Maintained reduced-motion handling and avoided a full table remount during normal close-row removal.
+- Fine-tuned sidebar collapse and expand to glide smoothly over 300ms with the Tessario drawer-style easing instead of snapping after labels fade.
+- Kept the sidebar active indicator lightweight while letting the sidebar and main content width adjust smoothly during collapse/expand.
+- Preserved centered collapsed sidebar icons and staged label fade/slide behavior during the smoother sidebar motion.
+- Slowed close-ticket row removal to a clearer 410ms slide/fade and 340ms transform-only row move-up.
+- Kept close-ticket status commits, queue count refreshes, and current-view removal deferred until the visible exit completes.
+- Diagnosed the remaining sidebar lag as layout animation plus repeated active-indicator measurement, not a ticket-table rerender.
+- Removed the sidebar's grid-column transition path and switched collapse/expand label treatment to staged opacity/transform fades.
+- Re-centered collapsed sidebar nav items as fixed 40x40 flex buttons so active and hover bubbles align with the icons.
+- Replaced close-ticket table row/cell height animation with a transform/opacity exit and a transform-only move-up pass for remaining rows.
+- Kept close-ticket status commits and queue count refreshes after the exit completes, without remounting the whole table when rows remain.
+- Removed temporary timing logs for sidebar collapse, row close, and table rerender checks after the performance diagnosis.
+- Polished left-sidebar collapse and expand timing with the shared motion system and a dedicated 220ms sidebar duration.
+- Added a transform-driven sliding active indicator for Dashboard, Tickets, Admin, and Settings in the primary sidebar.
+- Fixed collapsed sidebar icon alignment so each nav item has a centered active/hover bubble with no label or badge spacing offset.
+- Added a one-shot Settings gear spin when Settings is selected, while respecting reduced-motion preferences.
+- Fixed the close-ticket row removal timing so the confirmation modal no longer hides the row exit animation.
+- Reworked queue row closing into a visible slide-right/fade followed by a late compact height collapse, keeping the ticket in the visible table until the exit sequence completes.
+- Restored the queue preview Change status button to open the status confirmation flow directly, so single-ticket closes from Open and Assigned To Me animate in the queue.
+- Confirmed bulk close still locks/removes selected rows, updates counts after completion, and keeps the tickets visible in Closed.
+- Improved dropdown performance so opening/closing custom selects no longer triggers the app-wide select refresh path or remounts the ticket table.
+- Kept dropdown state lightweight and local, scoped bulk-action select enhancement to the bulk action bar, and preserved shared z-index/dropdown motion tokens.
+- Smoothed dropdown keyboard and selection behavior by updating active option state in place and closing menus before dispatching value-change work.
+- Fixed ticket-table checkbox selection flicker so checking, unchecking, select-all, and Clear selection no longer rebuild or visibly refresh queue rows.
+- Added a lightweight queue selection sync path that keeps selected IDs separate from ticket data and only updates checkbox state, select-all indeterminate state, and the bulk action bar.
+- Preserved the bulk action bar animation while preventing simple selection changes from replaying row-enter animations or remounting the table.
+- Fixed dropdown stacking so custom select menus render above queue table rows, sticky headers, selected-row highlights, and other local table layers.
+- Updated the shared z-index variables so `--z-dropdown` is above `--z-sticky`, preserving the animation-system layering tokens instead of adding one-off z-index literals.
+- Hardened custom-select mounting with a top-layer/body portal path and dialog fallback so bulk actions, filters, assignment controls, macros, receipt/warranty selects, and profile/settings selects keep their dropdown motion without being clipped by table containers.
+- Refactored the whole Tessario motion layer onto shared transition presets for interactive controls, panels, rows, tabs, fields, dropdowns, and drawers.
+- Applied the shared motion system to sidebar collapse/active navigation, top buttons, queue tabs, bulk actions, ticket row hover/selected/remove states, dropdowns, modals, Tessario Assist, Knowledge Vault, Profile/Settings/Admin surfaces, toast notifications, reply tabs, composer controls, and queue search/filter UI.
+- Centralized animated transform distances and shadows for lifted/pressed controls, active tabs, sidebar controls, preview actions, drawer surfaces, toggle knobs, and floating reply actions.
+- Rechecked the static motion rules so there is no `transition: all`, no hardcoded `150ms`, no hardcoded pixel transform distances, and no old animated z-index layer literals in the app motion surface.
+- Added shared motion distance variables, z-index layer variables, and dropdown/drawer/toast shadow tokens so motion timing, easing, distance, layering, and animated shadows are centralized.
+- Added reusable `will-animate-transform`, `will-animate-opacity`, `motion-safe`, and `motion-reduced` utility classes.
+- Tightened reduced-motion handling so drawers, modals, dropdowns, toasts, and row removal use opacity-only behavior while keeping controls usable.
+- Standardized close-row removal timing to complete around the CSS motion duration, with status commits and queue refresh happening after the exit animation.
+- Ran the requested QA checklist locally: Tessario Assist, New Ticket, Customer History, receipt modal, dropdowns, tab switching, sidebar collapse/expand, single close, bulk close, Closed-tab visibility, reduced-motion mode, and console stability.
+- Added a reusable Tessario motion system with official timing variables, easing variables, fade/slide/scale/row utility classes, and global reduced-motion handling.
+- Rebuilt ticket close/removal around explicit `closingTicketIds` and `pendingStatusChanges` state so rows lock during removal and queue counts update after the animation completes.
+- Fixed single and bulk close removal so Open / Assigned To Me queue rows slide right, fade out, compress height, and let lower rows move up with a subtle spring settle before the Closed status is committed.
+- Updated close toasts to use the concise `Ticket #_____ closed.` message while keeping closed tickets available in the Closed Tickets view and customer history.
+- Verified locally that one-ticket close, bulk close, Closed-tab visibility, and console stability pass on the static app.
+- Added a subtle sliding active indicator for the Open, Assigned To Me, and Closed queue tabs, with restrained 180ms motion and reduced-motion compatibility.
+- Fixed the queue bulk action status dropdown so "Change status" displays in full without ellipsis while Reassign and Clear selection remain compact.
+- Replaced the primary sidebar's filled icons with consistent stroke-based line icons for Dashboard, Tickets, Admin, Settings, and sidebar collapse/expand.
+- Added collapsed-sidebar tooltips for primary navigation icons and tightened icon centering, stroke width, inactive contrast, and active Tessario cyan treatment.
+- Polished dense app typography across queue tables, sidebar labels, buttons, labels, muted copy, and ticket subjects for sharper professional readability without making the UI bulky.
+- Enlarged the selected-ticket preview Open full ticket action into a full-width primary button with centered text, stronger padding, and hover/active motion.
+- Earlier simplification reduced visible ticket statuses to Open and Closed across queue tabs, table badges, ticket controls, New Ticket, bulk status changes, Customer History, dashboard filters, workload counts, and Tessario Assist context before Waiting On Response was restored.
+- Earlier legacy/mock status normalization displayed Closed/Resolved as Closed and other old statuses as Open, while SLA overdue stayed a separate due-time indicator.
+- Removed the Dashboard sidebar number badge and cleaned the sidebar to Dashboard, Tickets, Admin, and Settings.
+- Moved admin-only access for Tessario Assist, Knowledge Vault, Macros, Assignment Pool / Reps, and Workspace Settings into the Admin screen, with CS14 Robert retaining access and normal reps hidden from admin-only tools.
+- Reduced Tickets page tabs to Open, Assigned To Me, and Closed while preserving queue search and table sorting.
+- Fixed the Reply/Internal Note segmented composer tabs so the sliding pill initializes cleanly without the stray left-edge mark, while preserving the tab switch animation and focus behavior.
+- Increased the Ticket Detail reply editor to a comfortable 200px minimum height with vertical resizing, keeping the formatting toolbar, attachment dropzone, signature options, and send controls aligned below.
+- Removed Priority from Tessario's visible workflow: queue table column, Ticket Detail header/controls, selected-ticket preview, New Ticket form, queue card badges, search/sort behavior, Assist ticket context, and dashboard timing weights.
+- Removed the blank per-column filter input row under the queue table headers while keeping the main Queue search bar, table header sorting, and bulk status/reassign actions.
+- Redesigned Ticket Detail into a compact two-row header with Back, ticket number, status/SLA/email pills, and Copy link in row 1, plus subject/customer/model/order context and compact controls in row 2.
+- Kept the customer ticket count in the Ticket Detail header based only on matching customer email history.
+- Reduced Ticket Detail header padding, title sizing, control heights, and thread top padding so the conversation starts higher while preserving status change, reassignment, customer history, copy link, thread, composer, and Tessario Assist behavior.
+- Hardened Copy ticket link against blocked clipboard permissions so the header action does not create console errors.
+- Fixed the queue bulk action layout shift by adding a permanent reserved `#bulkActions` slot in the queue controls so the ticket table stays in the same position with or without selected tickets.
+- Kept the no-selection bulk action area visually empty while preserving fixed height, and changed the show/hide animation to opacity/transform only.
+- Tuned bulk action entry/exit motion to a polished 180-220ms fade + slight lift/scale with subtle spring feel, reduced-motion compatibility, and no margin/padding layout animation.
+- Verified bulk status and reassign confirmation modals still open from the reserved bulk action bar with no console errors.
+- Compacted the Ticket Detail header from a 5-row stack to a 3-row layout (~85px tall, ~40% shorter than before) so the conversation thread starts higher on the screen. Moved Back to queue into the badges row, dropped per-control labels, shrank the selects from 34px to 28px tall, and shrank the subject from 17px to 15px with single-line ellipsis truncation.
+- Added customer ticket count next to the hyperlinked customer name in the Ticket Detail header (`Carmen Ellis (3)`). Count matches by `customer.email` only and clicking still opens Customer History.
+- Added smooth fade + slide-down + subtle scale animation to the queue bulk action bar (180ms ease-out) so `N selected`, the Change status dropdown, the Reassign dropdown, and Clear selection no longer pop in instantly. Animates out on selection clear; count-only updates do not re-run the entrance animation; layout stays stable; respects `prefers-reduced-motion`.
+- Redesigned Ticket Detail layout so the conversation thread is the primary reading area: removed sticky composer, wrapped thread + composer in a single `#conversationScrollArea`, composer now lives at the bottom of the scroll document and is reached by scrolling down.
+- Added `Reply â†“` floating pill button that fades in when the rep is more than 180px from the composer; clicking it smooth-scrolls to the reply dock.
+- Changed ticket-open scroll behavior to `scrollToLatestMessage()` (last message in view, composer off-screen); post-send scroll still uses `scrollConversationToBottom()` (composer in view).
+- Fixed reply composer From field to show only `support@ispringfilters.com` (removed personal hotmail address and rep display name from the sender select).
+- Updated `workspaceConfig.supportMailbox` to `support@ispringfilters.com`.
+- Added `repLabel()` helper returning `CS14  Robert`; rep messages in the thread now show this internal label instead of the full last name.
+- Added sliding pill animation to Reply / Internal Note tabs: `.reply-tab-pill` element slides between tab positions at 170ms with `ease-standard`; tab switching no longer re-renders the whole conversation so the animation plays live; respects `prefers-reduced-motion`.
+- Fixed formatting toolbar (Bold, Italic, Underline, Bulleted list, Numbered list, Link) by adding `mousedown` + `e.preventDefault()` to each button so the textarea keeps focus and selection is preserved when the toolbar button is clicked.
+
+- Fixed ticket row navigation so clicking a queue row, ticket number, or subject opens that row's actual ticket detail instead of being reset to the first visible ticket.
+- Fixed the `customerAccounts` initialization-order crash by making account derivation use the account currently being built instead of reading the global account store before initialization.
+- Updated ticket schema validation so valid long-thread timeline records no longer trigger repeated workspace reseeds that clear the selected ticket.
+- Added a hidden ticket-navigation diagnostic flag for confirming clicked ticket ID/number and opened ticket number without leaving default console noise.
+- Fixed the queue/detail email-count mismatch by making both surfaces use the same visible-thread customer/rep message-count helper.
+- Removed system activity and internal notes from the email count, including the previous fallback path that could count timeline rows.
+- Added singular/plural email-count labels, Ticket Detail debug attributes for emailCount, visibleEmailMessages, and totalThreadItems, and bumped the workspace seed key to reseed stale browser data.
+- Added an Emails column to the ticket queue between Last Updated and Subject so reps can quickly identify messy long-thread tickets.
+- Added customer/rep message counting that excludes internal notes and only falls back to system activity when no customer/rep message type exists.
+- Added compact Emails pills in the queue table and an email-count badge near the Ticket Detail header.
+- Added 10 heavier long-thread iSpring mock tickets with 20+ messages each for testing Ticket Detail long-conversation scrolling, sticky reply composer behavior, timeline readability, receipt events, status changes, reassignment events, internal notes, and support back-and-forth.
+- Added extended scenarios for RO tank not filling, high TDS after membrane/filter change, RO500AK beeping after filter replacement, whole-house pressure drop, WCS45KG brine/startup behavior, UVF55FS lamp/ballast troubleshooting, WSP50ARB sediment-screen low flow, Amazon damaged shipment replacement, missing warranty receipt registration, and frustrated return/replacement escalation.
+- Replaced Ticket Detail's Smart Diagnosis sidebar card with a concise Next Best Step support-helper card showing most likely issue, what to check next, and what result confirms it.
+- Updated the Ticket Detail sidebar order to Tessario Assist, Next Best Step, Customer Snapshot, Macros, Product Link, and collapsed Order / Warranty.
+- Bumped the ticket workspace storage key so local demo browsers reseed with the extended long-thread mock tickets and updated sidebar helper.
+- Added 15 realistic long-thread iSpring mock tickets with 6-12 messages each for testing Ticket Detail readability, scrolling, sticky composer behavior, timeline rows, and long back-and-forth support cases.
+- Included long-thread scenarios for RO tank fill issues, RO500AK beeping/reset loops, WGB32B pressure drop, missing warranty receipts, Amazon shipment damage disputes, return-policy frustration, WCS45KG brine/startup issues, UVF55FS ballast/lamp troubleshooting, WSP50ARB sediment clogging, and high TDS after membrane change.
+- Added long-thread coverage for frustrated customer tone, replacement parts sent, receipt/warranty activity, internal notes, assignment changes, status changes, attachments, escalated tickets, and overdue tickets.
+- Bumped the ticket workspace storage key so demo browsers reseed with the expanded long-thread ticket set.
+- Upgraded Ticket Detail so the conversation thread takes precedence, the reply composer stays sticky at the bottom of the detail panel, and latest-message scroll behavior runs when opening a ticket or adding new composer output.
+- Redesigned the reply composer into a compact polished SaaS control surface with cleaner From/Recipient/Macro rows, segmented Reply/Internal Note tabs, modern formatting buttons, a focused editor card, compact attachment control, signature pills, validation messaging, and refined action buttons.
+- Fixed composer behavior for Reply/Internal Note mode switching, bold/italic/underline/list/link insertion, canned response insertion, mock attachments, draft saving/persistence, disabled empty sends, clear empty validation, customer reply posting, internal note posting, send/save toasts, and post-send scroll-to-bottom.
+- Replaced native dropdown/select presentation with a shared Tessario custom-select system that preserves the underlying form selects while rendering polished white menus, soft borders, shadows, rounded corners, blue selected states, hover states, chevrons, and consistent sizing.
+- Added dropdown fade/slide open and close motion, click-outside close, Escape close, arrow/Home/End/Enter keyboard navigation, viewport-aware positioning, modal-safe menu placement, high z-index layering, and `prefers-reduced-motion` support.
+- Applied the custom dropdown system across queue filters, bulk status/reassign actions, ticket detail status/reassign controls, macro selectors, purchase source selectors, receipt/warranty modals, profile/settings selects, dashboard filters, admin controls, Knowledge Vault controls, and New Ticket selects.
+- Simplified editable/filterable ticket status dropdown options to Open, Closed, Resolved, and Overdue while leaving existing mock legacy statuses available in stored/demo ticket data where other views still read them.
+- Added a Product Link Library to Tessario Knowledge Vault with seeded Amazon, Home Depot, Google Review, and Trustpilot links persisted in localStorage.
+- Added admin controls to add, edit, deactivate/remove, search, and filter Product Link Library entries by model or platform.
+- Connected the Ticket Detail Product Link card to the editable Product Link Library so product and review link actions use saved library data.
+- Redid close-ticket queue removal so Closed or Resolved tickets slide right with a subtle fade, then collapse after exit while rows below fill upward with a restrained spring-like motion before counts refresh.
+- Kept Closed/Resolved tickets in the persisted ticket data so they continue to appear in Closed views and customer history.
+- Updated the close-removal toast to `Ticket #_____ closed.`
+- Removed the Ticket Detail right-sidebar Quick Actions card and its status, reassign, macro, copy-link, and escalation controls.
+- Added a compact daily iSpring Macros card to Ticket Detail with warranty receipt request, warranty registration completed/review request, replacement parts sent/review request, and review follow-up/update request macros.
+- Added Product Link context to Ticket Detail with model/source display, saved product-link lookup, copy/insert actions, no-saved-link messaging, and Google/Trustpilot review link copy actions when review follow-up is relevant.
+- Expanded macro variable replacement to include full customer name and product/review links while keeping Robert as the rep signature source.
+- Expanded the default iSpring mock ticket seed by 100 additional realistic support cases across product families, sources, statuses, reps, receipt/warranty states, and repeat-customer histories.
+- Bumped the ticket workspace storage key so local demo browsers reseed with the expanded ticket set.
+- Simplified the Ticket Detail right sidebar to compact Tessario Assist, diagnosis guidance, Customer Snapshot, and Quick Actions cards.
+- Removed extra sidebar Tessario Assist prompt buttons so prompt shortcuts stay inside the Assist drawer.
+- Moved Order / Warranty into a single collapsed section with order/source/receipt/warranty controls and no duplicate default order detail cards.
+- Removed long AI-assignment copy and duplicate receipt/warranty metadata from the visible ticket rail.
+- Polished the top navigation action cluster with premium Tessario button styling for Assist, New Ticket, notifications, and profile access.
+- Replaced the top-bar Tessario Assist control with a compact icon-led `Assist` launcher that keeps Global mode separate from ticket-context Assist.
+- Added a subtle `Assigned To Me` queue-tab count badge for the current user's tickets without reintroducing large metric cards.
+- Refined Tessario Assist drawer open/close motion with a right-side slide, soft overlay fade, and reduced-motion support.
+- Removed the duplicate sidebar Tickets plus button so New Ticket in the top bar remains the single manual ticket creation entry point.
+- Made Knowledge Vault and Macros visible only to Admin users in the sidebar, with route guards for non-admin reps.
+- Improved sidebar workspace footer logo visibility by setting the iSpring logo on a subtle bright pill while preserving the `Workspace` / `iSpring` footer text.
+- Completed a full production-polish pass across Tessario's shared surfaces, tables, forms, modals, drawers, cards, buttons, badges, tabs, and empty states.
+- Added a consolidated polish layer for premium Tessario shadows, focus rings, field borders, raised panels, tactile hover states, dense table headers, and consistent modal/drawer treatments.
+- Cleaned visible Knowledge Vault and Tessario Assist source messaging so it no longer reads like implementation notes.
+- Fixed sidebar navigation polish so Ticket Detail keeps Tickets as the only active primary nav item.
+- Redesigned the Edit receipt details modal into a wider, grouped, production-ready form with Receipt file, Purchase details, Customer details, Warranty registration, and Review / verification sections.
+- Added premium receipt edit styling with soft card sections, rounded inputs, Tessario focus states, a branded warranty toggle, sticky footer actions, and no cramped horizontal-scrolling field grid.
+- Updated receipt detail save behavior so warranty unregistering confirms before clearing fields, registering fills missing registered date/by values, and saved edits mark the receipt verified by the rep.
+- Polished the sidebar workspace footer with the real iSpring logo, short `Workspace` / `iSpring` label, and no old `iS` placeholder.
+- Removed the extra collapsed-sidebar expand arrow and kept one clean footer collapse/expand control with centered icon-only collapsed navigation.
+- Fixed duplicate receipt metadata so multiple receipts on the same customer no longer reuse the same source/order/model details by default.
+- Added MVP Tessario receipt AI extraction from each receipt file name and upload metadata, storing file name, purchase source, order number, model number, customer name/email, purchase date, upload date, uploaded by, receipt status, confidence, and extraction notes per receipt.
+- Added Needs Review behavior when receipt source/order/model cannot be detected, using ticket metadata only as a low-confidence fallback when the receipt file provides no detectable details.
+- Added per-receipt status metadata for Customer History receipt records.
+- Added Edit receipt details on each receipt card, with manual edits marking the receipt as Verified and setting the extraction note to Verified by rep.
+- Kept warranty registration linked to individual receipt records and kept registered warranty counts based only on receipts with registered warranty records.
+- Added a top-right notification bell with unread count, filterable notification dropdown, notification read/clear actions, and ticket-opening actions.
+- Added realistic CS14 Robert notification examples for ticket assignment, customer replies, SLA risk, overdue tickets, reassignment, mentions, receipts, warranty actions, Tessario Assist drafts, and assignment eligibility changes.
+- Added curated high-value notification event hooks and avoided noisy events such as filter clicks, macro insertion, and minor edits.
+- Expanded Profile > Notifications preferences for assigned tickets, customer replies, SLA/overdue, mentions, receipts/warranty, Tessario Assist, in-app notifications, and mock email notifications.
+- Redesigned the left Tessario sidebar into a premium icon-led SaaS nav with Dashboard, Tickets, Assist, Knowledge Vault, Macros, Admin, and Settings.
+- Moved Open, Closed, Escalated, and Overdue out of the main sidebar while keeping Open, Assigned To Me, Closed, Escalated, and Overdue as Tickets page tabs.
+- Added a compact sidebar Create ticket button beside Tickets, smaller count badges, stronger active state, smoother hover motion, collapsed icon/tooltips, and a polished workspace switcher footer.
+- Added app-wide motion tokens with quick 140-190ms timings, polished cubic easing, and `prefers-reduced-motion` support.
+- Added subtle page/view transition motion across Queue, Ticket Detail, Dashboard, Admin, Knowledge Vault, and profile/settings flows.
+- Expanded button, table row, modal, drawer, sidebar, tab, toast, and alert motion while keeping the support UI restrained and fast.
+- Added quiet row enter/hover/selected transitions for filtered ticket tables, dashboard/admin/knowledge tables, and Customer History tables.
+- Simplified the Ticket Detail right sidebar into a shorter action-first rail with Tessario Assist, Quick Actions, diagnosis guidance, and Customer Snapshot visible by default, with Order / Warranty moved into a disclosure.
+- Previously moved AI assignment explanation, full customer details, full order details, history/notes, receipt/warranty metadata, macros, attachments, checklist, guardrails, manager view, and similar tickets into collapsed sections; the current ticket rail now keeps only Order / Warranty collapsed.
+- Reverted Customer History from tabs to one compact single-page account view with Customer profile, Ticket history, Receipts & warranty, and Account notes sections.
+- Added 25 realistic iSpring mock tickets across several customer emails, including repeat histories for Harper Stone, Olivia Carter, CS14 Robert test customer, Parker Lane, Dana Mitchell, and Chris Huang.
+- Kept Customer History matching by email address only while expanding the repeat-customer ticket history data.
+- Bumped ticket workspace storage to reseed the richer default mock-ticket set for local demo browsers.
+- Combined saved receipts and warranty registrations into one Receipts & Warranty section with one linked warranty status per receipt card.
+- Updated receipt/warranty cards to show receipt file, source, order, model, upload metadata, warranty status, registered date/by, and View, Mark verified, Register/Unregister, and Apply actions.
+- Updated Customer History saved-receipt and registered-warranty counts to derive directly from receipt cards and linked registered warranty records.
+- Added Edit customer in Customer Overview with editable name, email, phone, mobile, and address fields plus confirmation before changing the email key.
+- Cleaned up the Create Ticket modal with a shorter required-details section and an Advanced details disclosure for optional support context.
+- Removed random-assignment explanation copy from manual Create Ticket because manual/outbound-first tickets are assigned directly to the creating rep.
+- Updated manual Create Ticket assignment so tickets created by CS14 Robert are assigned to CS14 Robert and get the timeline reason "CS14 Robert created this ticket manually."
+- Updated incoming-email assignment rules to prefer subject-mentioned active eligible reps, then customer history by email, then random eligible active reps.
+- Updated assignment copy to remove the lowest-workload routing language.
+- Redesigned Customer History as a customer account profile instead of a receipt/warranty form.
+- Added Customer Overview, Ticket History, Saved Receipts, Warranty Registrations, and Account Notes sections to Customer History.
+- Expanded Customer History summary counts to include total tickets, open tickets, closed/resolved tickets, saved receipts, registered warranties, and last contact date.
+- Added an email-only Ticket History table with ticket number, subject, status, last updated, assigned rep, model, and purchase source.
+- Removed contradictory warranty display so "Registered" is shown only when a registered warranty record exists.
+- Improved receipt cards with upload metadata, source/order/model, status, linked warranty state, and View, Mark verified, Register warranty, and Apply to current ticket actions.
+- Added Apply to current ticket actions for saved receipts and warranty registration records.
+- Added Customer History account notes with note entry, saved note list, timestamp, and rep name.
+- Polished the top queue tabs with quick professional hover/active transitions and a subtle underline indicator.
+- Added clickable queue-table ticket number and subject controls that open Ticket Detail without breaking row selection/preview behavior.
+- Added clickable queue-table customer name/email controls that open Customer History for the matching email address.
+- Improved Customer History so each saved receipt has a linked warranty registration record rather than relying on one customer-level warranty flag.
+- Replaced the one-way warranty registration action with checkbox-style controls that reps can check or uncheck per receipt, with confirmation before unregistering.
+- Updated warranty registrations to show receipt/file name, model, order number, purchase source, registration status, registration date, registered by, and notes.
+- Updated Customer History top counts so saved receipts count receipt records and registered warranties count only registered receipt/product records.
+- Restored the Open Tickets left Tessario navigation sidebar while preserving the working center ticket table.
+- Restored the right selected-ticket preview sidebar with brief ticket details and queue action buttons.
+- Removed the temporary Open Tickets debug panel and debug console output.
+- Verified the queue renders with visible left navigation, 13 visible table rows, a populated right preview, no debug panel, and no app console errors.
+- Fixed the JavaScript startup crash where customer account derivation used `profile` before initialization.
+- Added guards so bad or incomplete profile/customer account data cannot prevent Open Tickets from rendering.
+- Verified Open Tickets renders the ticket table headers and visible rows with no app console errors after the crash fix.
+- Added the exact plain Open Tickets debug block directly under Queue search and mirrored the same values to the browser console.
+- Verified the current debug values show nonzero total tickets, nonzero filtered tickets, `tableRenderFunctionCalled: true`, and `renderError: none`.
+- Confirmed the Open Tickets table headers and visible ticket rows render under the search/debug area.
+- Added an Open queue recovery guard that reseeds default iSpring tickets when persisted data leaves the Open queue with zero active tickets and no active filters/search.
+- Added a visible Open Tickets debug panel under Queue search with totalTickets, filteredTickets, activeQueue, activeTab, searchQuery, showFilters, tableShouldRender, firstTicketId, localStorage ticket-key presence, renderTableCalled, render error, and CSS visibility details.
+- Confirmed through the debug panel that Open Tickets has ticket data, the Open filter is returning rows, the table render function is being called, and table CSS is not hiding the rendered table.
+- Added a visible Reset ticket data recovery action to reseed the ticket workspace from the default iSpring ticket set if saved browser data is corrupted.
+- Emergency-fixed the blank Open Tickets table risk by tightening localStorage ticket schema validation for row/search fields and reseeding stale or malformed saved ticket arrays before rendering.
+- Temporarily checked queue diagnostics above the table for totalTickets, filteredTickets, activeQueue, and renderTable, then removed the debug text after confirming the table rendered.
+- Verified Open Tickets shows table headers and rows by default, shows "No tickets match this view" plus Clear Filters when search hides all rows, and restores rows after clearing.
+- Restored the Open Tickets queue page to the earlier reference layout with the iSpring workspace header, centered global search, right-side Tessario/New Ticket/profile controls, Open Tickets title, queue tabs, compact queue search, and the ticket table directly underneath.
+- Moved checked-ticket bulk actions into the right side of the queue search strip so the previously blank area shows selected count, Change status, Reassign, and Clear selection when tickets are checked.
+- Verified bulk Change Status and Reassign confirmation modals show selected ticket numbers/subjects, accept an optional internal note, update selected tickets on confirm, add timeline/internal-note entries, clear selection, and refresh queue state.
+- Browser-verified the restored queue layout, visible rows, search/table headers, row-to-detail navigation, New Ticket modal, Knowledge Vault, Tessario Assist, and console stability.
+- Fixed the Open Tickets blank queue regression by hardening ticket localStorage normalization/reseed behavior, sanitizing invalid queue filter/sort state, and preventing the ticket table area from collapsing.
+- Verified Open Tickets renders the requested checkbox, Ticket #, Last Updated, Emails, Subject, From, Assigned To, and Status headers with ticket rows immediately below search.
+- Verified no-match search/filter behavior shows "No tickets match this view" with a Clear Filters button, then restores visible rows after clearing.
+- Browser-verified the Open Tickets table and console stability after the fix.
+- Completed emergency Open Tickets recovery so the Queue screen is one full-width ticket table area with no middle panel, right context panel, or queue preview rail.
+- Removed Queue-screen leftovers from the DOM/top bar, including Hide context, Copy ticket link, Card View, Compact controls, and the queue preview element, while preserving Ticket Detail's inline Copy ticket link.
+- Updated ticket-table row clicks so a single click opens the separate Ticket Detail screen.
+- Browser-verified Open Tickets load, visible rows, search, row-click detail navigation, and console stability.
+- Fixed the remaining Open Tickets queue regression by letting the ticket workspace fill the app height after the metric strip was removed, keeping rows visible directly below search/filter controls.
+- Removed top-bar Hide context and Copy ticket link actions, kept Copy ticket link inside Ticket Detail, and separated the Dashboard sidebar count badge from the label.
+- Verified the default Open Tickets table rows, empty-state Clear filters action, Ticket Detail copy action, and console stability in the browser.
+- Fixed the Open Tickets layout regression so the queue screen uses one full-width table column, hides the empty preview/conversation/context panels, and renders ticket rows directly below the search/filter controls.
+- Improved Tessario Assist so Global mode behaves more like a conversational iSpring support copilot for normal questions, including RO500 overview, RCC7AK low-flow troubleshooting, RO500 reset/beep issues, whole-house pressure-drop triage, water-test guidance, next customer questions, and draft responses.
+- Updated Tessario Assist source detection so approved Knowledge Vault files are recognized from either Approved status or Approved for Tessario Assist metadata, with compact `Source: filename` notes when approved sources are used.
+- Kept Tessario Assist suggestions optional/collapsible, kept Copy response available, and preserved Insert draft as Ticket-mode-only behavior.
+- Added a clear code note that real Knowledge Vault PDF/DOCX/TXT content parsing requires backend storage, extraction, indexing, and citation beyond the current metadata-only MVP.
+- Built a static front-end prototype for Tessario.
+- Added desktop-first CRM layout with dark navy sidebar.
+- Added top bar with global search, New Ticket, copy ticket link, and user profile.
+- Added compact dashboard metric strip calculated from mock data.
+- Added the original three-column ticket workspace.
+- Revised the workspace into a two-screen flow: Ticket Queue for scanning and Ticket Detail for deep ticket work.
+- Simplified the sidebar to primary support views only: Open, Closed, Escalated, and Overdue.
+- Moved Assigned to Me, Waiting Customer, Waiting iSpring, Warranty, Replacement Parts, and Review Follow-Up into saved queue filters inside the Ticket Queue screen.
+- Added ticket queue with search, filters, sorting, density toggle, and selected state.
+- Added a lightweight Selected Ticket Preview panel on the queue screen with an Open full ticket action.
+- Expanded the Selected Ticket Preview into a full-height, scrollable queue-side summary with Customer, Assignment, Product, Order/Warranty, Activity, Missing info, and AI Assignment sections.
+- Added queue preview quick actions for Change status, Reassign, Customer history, and Open full ticket.
+- Added Card View / Table View queue toggle with Table View as the default for support-volume scanning.
+- Added a dense modern Queue Table inspired by OST workflows, with sticky headers, sortable columns, compact alternating rows, hover/selected states, and small badges.
+- Refined the Open Tickets page into a cleaner OST-inspired Tessario queue structure with search/filter controls, dense table focus, and right-side preview only when space allows.
+- Reduced the visible queue columns to Ticket #, Last Updated, Subject, From, Assigned To, and Status while preserving broader search/filter behavior.
+- Removed the visible Tags column from Table View and kept issue/category data internal for search and diagnosis.
+- Replaced literal sort direction words with compact CSS sort icons.
+- Added quick queue controls for Open, My Tickets, Search, New Ticket, Use Filters, Sort, and Reset filters.
+- Fixed quick queue active-state behavior so only the selected control is solid green and New Ticket is active only while the create-ticket modal is open.
+- Added a pinned left-edge Expand sidebar control so the collapsed sidebar can always be reopened.
+- Added main support views for Open, Closed, Escalated, and Overdue, plus saved queue filters for Assigned to Me, Waiting Customer, Waiting iSpring, Warranty, Replacement Parts, and Review Follow-Up.
+- Simplified the Open Tickets page into a clean search-first ticket table by removing the My Tickets, Waiting Customer, Waiting iSpring, Warranty, Replacement Parts, and Review Follow-Up filter chips, plus the Table View display button.
+- Added simple queue tabs above the ticket table for Open Tickets, Assigned To Me, Closed, Escalated, and Overdue without bringing back filter chips, Card View, or metric cards.
+- Tightened the queue search row spacing so the search label/input use normal toolbar height and the ticket table starts closer beneath it.
+- Simplified ticket status options to Open, Closed, Resolved, and Overdue across filters and ticket status controls.
+- Added confirmation modals for status changes and reassignments with ticket context, active eligible reps, optional internal notes, and Confirm/Cancel actions.
+- Simplified the Selected Ticket Preview into a brief ticket summary while keeping purchase source, receipt status, warranty status, and the main queue actions visible.
+- Added mock Tessario AI purchase-source detection for new/imported tickets, with timeline events and manual purchase-source updates from Ticket Detail.
+- Added localStorage-backed customer account receipt and warranty metadata keyed by email, including Customer History and Ticket Detail actions to add receipts and register warranties.
+- Added a Customer History receipt upload modal that accepts PDF, PNG, JPG, and JPEG files by picker, drag-and-drop, or pasted screenshot, then saves receipt metadata to the customer email history and marks future tickets from that email as receipt on file.
+- Updated Customer History warranty registration so Register warranty saves registered status/date/source/order/model to the customer email account, changes the action to "âœ“ Warranty registered," and marks future tickets from that email as Warranty: Registered.
+- Added repeat-customer assignment for New Ticket creation so tickets from an email with prior tickets are assigned to the most recent previous active/eligible rep before falling back to the assignment pool.
+- Expanded Customer History to show saved receipt and warranty metadata by customer email, including purchase source, order/model ties, saved or registration dates, and notes.
+- Expanded queue search coverage across ticket number, subject, customer, email, model, order, assigned rep, tags, missing info, and message text.
+- Added realistic iSpring mock tickets.
+- Added selected ticket conversation panel.
+- Added Back to queue behavior from Ticket Detail.
+- Added a Ticket Detail status control with immediate mock/localStorage persistence, count updates, and timeline events.
+- Added manual assignment override on Ticket Detail.
+- Added Closed status support so closed/resolved tickets leave Open and appear under Closed.
+- Added Customer History from Ticket Detail and Queue Preview, matched by customer email only, with clickable history tickets.
+- Added customer messages, rep replies, internal notes, and timeline events.
+- Added reply/internal-note tabs and reply editor.
+- Reworked thread activity updates into smaller, quieter timeline rows for created, assigned, status-changed, reassigned, and AI-assignment events.
+- Redesigned the reply composer with From, Recipients, canned response, formatting toolbar, large editor, attachment drop zone, signature options, and draft/send controls.
+- Added macro search, pinned macros, insert/copy actions, and variable replacement.
+- Added macro categories for Warranty, RO Troubleshooting, Tankless RO, Whole House, Replacement Parts, Returns, Reviews, and Water Tests.
+- Added stronger signed iSpring-style macros for receipt/warranty, tank pressure reset, tankless reset/rinse, replacement parts and review requests, returns, and water-test follow-ups.
+- Added the original diagnosis guidance panel.
+- Added customer profile, order/warranty, product/model, attachments, checklist, guardrails, and manager view.
+- Added Clear filters empty state.
+- Added `/` keyboard shortcut hint for search.
+- Added local static server.
+- Added project documentation files.
+- Added the current full Tessario logo as `assets/tessario-logo.svg`.
+- Added sidebar and top-bar Tessario logo rendering with fallback text.
+- Added the new uploaded Tessario icon-only mark as `assets/tessario-mark.svg` and wired it to the sidebar mark and browser favicon while keeping the Tessario text and subtitle unchanged.
+- Corrected the Tessario icon placement so the uploaded icon-only mark is used only for the left sidebar brand mark and favicon, with a transparent sidebar presentation and text-only top header branding.
+- Added the uploaded full Tessario logo as `assets/tessario-logo.svg` while preserving the sidebar icon-only brand unit.
+- Added clickable top-right user profile control.
+- Added a My Profile settings modal with Account, Preferences, Signature, Notifications, and Workspace tabs.
+- Added CS14 Robert profile fields, avatar placeholder, admin badge, mock password/2FA controls, and admin-only assignment pool access.
+- Added localStorage-backed profile preferences for default landing view, queue mode, compact rows, metrics visibility, preview panel visibility, sidebar default, theme, accent color, ticket density, default sort, and auto-open first ticket.
+- Added signature settings with personal signature editor, department signature preview, default signature option, and optional signature insertion into customer replies.
+- Added mock notification preferences and quiet-hours settings.
+- Added save toast and top-right profile label updates when the display name changes.
+- Added mock-data schema validation so stale `localStorage` cannot leave the app with zero metrics or an empty queue.
+- Changed the default view to an all-active ticket view so first load shows tickets.
+- Redeployed the fixed version to the production alias.
+- Added workspace recovery for demo/QA reset behind Admin and Settings > Workspace.
+- Polished metric cards, selected queue state, focus states, and context accents.
+- Fixed the `renderMetrics` undeclared `value` runtime error that blocked the whole app render.
+- Fixed first-load modal state so Create Ticket stays closed until the user clicks `+ New Ticket`.
+- Fixed Create Ticket X and Cancel buttons so they close without submitting or triggering required-field validation.
+- Updated Create Ticket to always create a unique incremented ticket ID, open the new ticket, and write creation plus AI-assignment timeline events.
+- Added a persisted localStorage ticket-number counter so new tickets get the next available six-digit number, display as `Ticket #100001`, and do not reuse numbers after closed, deleted, archived, or reset tickets.
+- Replaced the Create Ticket Tags field with Issue type.
+- Reduced first-load visual overload by showing 4 core metrics and moving advanced context cards into collapsed sections.
+- Added collapse controls for the sidebar, metrics strip, ticket filters, and right context panel.
+- Removed static Create Ticket form markup from first-load HTML and now render it only while `isCreateTicketModalOpen` is true.
+- Confirmed no Create Ticket modal state is read from or written to `localStorage`.
+- Rebranded the product from the customer-specific iSpring Support Hub label to Tessario.
+- Separated the active workspace label as `Workspace: iSpring Water Systems`.
+- Replaced the previous product logo asset with the current Tessario logo.
+- Completed a calmer daily-use polish pass with quieter ticket cards, fewer default badges, smaller metrics, roomier conversation messages, and a more support-like reply composer.
+- Kept diagnosis guidance, Customer Profile, Order/Warranty, and Product/Model visible while leaving secondary context sections collapsed by default.
+- Added subtle tactile hover/click motion for primary queue, macro, composer, and navigation buttons.
+- Standardized the example support rep as CS14 Robert across mock data, profile, metrics, timelines, and macro signatures.
+- Added mock Tessario AI Assignment for new tickets through the assignment pool.
+- Added mock assignment users and roles: CS14 Robert as admin, plus CS1 Nick, CS2 Julius, CS3 Sean, CS4 Jonathan, and CS5 Michelle as reps.
+- Added an admin-only Assignment Pool screen for CS14 Robert with workload counts, add rep, enable/disable, remove warning, and reassign tickets controls.
+- Added a mock `workspaceConfig` layer so iSpring Water Systems is the default demo workspace rather than the Tessario product identity.
+- Moved active workspace values for departments, reps, macros, product/model data, warranty/return/review rules, ticket categories, source channels, custom fields, guardrails, review links, and support mailbox into `workspaceConfig`.
+- Updated sidebar/top-bar workspace labels, profile workspace facts, create-ticket options, macro source data, diagnosis helpers, checklist helpers, guardrails, similar-ticket references, replacement-part copy, and review links to read from the active workspace config.
+- Moved workspace-specific waiting status labels and create-ticket demo defaults into `workspaceConfig` so the queue and modal code stay Tessario-generic.
+- Implemented the official Tessario root color variables and mapped legacy CSS tokens onto Tessario Navy, Deep Blue, Blue, Bright Blue, Cyan, Violet, Soft Background, Card, Border, Muted, Text, and brand gradient values.
+- Applied the official palette across sidebar/header, main background, cards, borders, buttons, badges, queue/table hover and selected states, reply composer, cyan focus rings, profile/settings forms, Tessario AI accents, and success states.
+- Added Tessario Assist as a built-in mock Tessario AI support copilot with top-bar/sidebar launch buttons and a ticket-detail assistant panel.
+- Redesigned Tessario Assist into one shared conversational chat drawer for both Global and Ticket modes, with larger natural message bubbles, subtle Suggestions, a bottom textarea composer, Enter-to-send, Shift+Enter line breaks, Copy response, Ticket-mode Insert draft, Clear chat, a collapsible Sources area, and a safety note.
+- Split Tessario Assist history into a separate Global transcript and ticket-specific transcripts so Global mode never inherits selected-ticket context and each ticket opens with its own context.
+- Added ticket-aware mock Tessario AI responses for summaries, likely issue, next troubleshooting step, customer-safe draft replies, tone rewrites, product/model identification, missing-info checks, and macro suggestions.
+- Added Assist settings toggles for enabling Tessario Assist, ticket context, draft insertion, and required rep review before sending.
+- Replaced the seeded mock Tessario Knowledge Vault documents with an upload-based Tessario Knowledge Vault that starts empty.
+- Added Tessario Knowledge Vault file metadata for file name, file type, size, upload date, uploaded by, category, status, Approved for Tessario Assist, Internal only, Customer-facing allowed, title, owner, description, and last reviewed date.
+- Added admin-only Tessario Knowledge Vault controls for uploading supported files, editing metadata, removing files, approving files for AI, and marking files Draft, Needs Review, Approved, or Outdated.
+- Added a post-upload approval prompt for Tessario Knowledge Vault files with Approve now and Keep as draft actions.
+- Updated Tessario Knowledge Vault rows to show approved yes/no and an admin-only approve action.
+- Updated Tessario Assist to detect approved Tessario Knowledge Vault sources and show source names/status in the collapsible Sources area rather than appending source metadata into every answer.
+- Added MVP source behavior so approved filenames containing iSpring or Master Support are treated as the approved iSpring support source.
+- Fixed Tessario Knowledge Vault approval synchronization so uploaded files marked Approved in metadata are also approved for Tessario Assist and detected by the assistant after reload.
+- Updated Assist source awareness so an approved iSpring master source is shown as "Knowledge source available: iSpring Master Support Document" while the no-source message appears only when no approved source exists.
+- Added a main Tessario Dashboard screen inspired by OST's dashboard structure but redesigned around ticket health, workload balance, SLA risk, support trends, needs-action tickets, rep workload, product/model/issue patterns, and stuck/escalated ticket review.
+- Added dashboard filters for timeframe, department/team, rep, product family, channel/source, and status, plus dashboard Open ticket actions that jump into Ticket Detail.
+- Cleaned up Queue top-bar actions so Hide context and Copy ticket link are no longer shown on the Queue screen, kept Copy ticket link in Ticket Detail, and made the Queue title match the active queue view.
+- Removed the main-sidebar Reset demo data action and moved workspace recovery behind Admin and Settings > Workspace.
+- Wired the sidebar Settings button to open My Profile settings.
+- Replaced visible mock/prototype wording in profile, notifications, Assist, Tessario Knowledge Vault, and metrics with cleaner product copy.
+- Tightened queue table widths, queue control spacing, and reply composer spacing for a calmer desktop fit.
+- Completed a production-polish pass that tightened the shared button, table, modal, card, empty-state, ticket-thread, and composer styling.
+- Moved the metrics visibility action out of the primary top bar and kept the main header focused on search, Assist, and New Ticket.
+- Reduced Ticket Detail composer height so thread messages remain visible on normal desktop viewports.
+- Fixed the top header brand lockup so the full Tessario wordmark is the only Tessario name shown, with the workspace label kept as small muted text beneath it.
+- Updated the top header to represent the active iSpring workspace with an iSpring logo and small muted workspace label, while leaving the left Tessario sidebar branding unchanged.
+- Fixed the iSpring header logo visibility by converting the white-on-transparent asset into a visible blue workspace logo treatment and placing it in a compact white logo frame.
+- Tightened the Tessario sidebar brand lockup so the icon is vertically centered beside the two-line text block with a smaller gap and a 36px icon.
+- Removed the bordered white frame around the iSpring top-header logo so the workspace logo sits seamlessly on the header background.
+- Cleaned up the Open Tickets queue header by removing the top metric cards, Card View option, Compact checkbox, Hide metrics button, saved filter chips, and Table View display button while keeping search, sort/filter controls, and the ticket table.
+- Added bulk actions for checked queue-table tickets with selected count, bulk status change, bulk reassignment from active eligible assignment-pool reps, confirmation modals, optional internal notes, timeline events, and refreshed queue counts/views.
+
+## In Progress Items
+
+- Continue validating the two-screen Queue/Detail workflow with real support-rep feedback.
+- Validate the split Dashboard experience with support reps, managers, and admins so Manager View stays decision-grade while Rep View remains useful without exposing sensitive workload comparisons.
+- Better mock support workflows that feel like real iSpring support cases.
+- More consistent desktop fit at 1440x900 across the queue table and ticket detail context panels.
+- Continue checking 1280-1440px desktop widths for clean right-edge fit and table overflow behavior.
+- Tune AI-assignment wording and admin controls after real manager feedback.
+- Keeping app context documented for future Codex sessions.
+- Keep separating generic Tessario core workflows from demo-workspace configuration as new features are added.
+- Continue moving any new customer-specific statuses, queues, policy text, product defaults, and source-channel assumptions into workspace configuration rather than core UI code.
+- Validate Tessario Assist prompts with real support-rep examples and keep responses clearly marked as rep-reviewed drafts.
+- Add real backend file storage, PDF/DOCX/text extraction, indexing, and source citation for Tessario Knowledge Vault uploads before using document contents as live Tessario Assist context.
+
+## Next Best Improvements
+
+- Split `app.js` into separate files:
+  - `workspaceConfig.js`
+  - `mockData.js`
+  - `macros.js`
+  - `renderQueue.js`
+  - `renderConversation.js`
+  - `renderContext.js`
+  - `utils.js`
+- Add editable saved custom views if support reps need more than the sidebar queues and compact filter panel.
+- Add visible queue column preferences.
+- Add richer assignee controls to the ticket header if rep workflow testing calls for them.
+- Add better ticket detail editing for product/order/warranty fields.
+- Add skill-based assignment routing for product family, issue type, and coverage schedules.
+- Add an admin audit trail for assignment-pool changes.
+- Add favorite toggles and team/admin ownership controls for macros.
+- Add macro preview expansion instead of relying on title hover.
+- Add attachment preview modal.
+- Add product knowledge details per model.
+- Add deeper dashboard drilldowns for workload forecasting, SLA breach causes, oldest-ticket review, and escalation coaching views.
+- Connect Tessario Assist to a real model provider behind an internal API when backend/auth exists.
+- Add transcript persistence and richer prompt templates for Tessario Assist.
+- Add version history, parsed-content previews, document attachments, reviewer approval workflows, and source citation for Tessario Knowledge Vault files.
+
+## Bugs To Fix
+
+- Clipboard actions may fail silently depending on browser permission.
+- Attachment previews now render in the ticket thread and modal, but real file storage/download still needs a backend.
+- `localStorage` is schema-validated, but future data-model changes should still bump `STORAGE_KEY`.
+- Customer account receipt/warranty history is still localStorage-only and will need backend persistence before real multi-rep use.
+- The static create-ticket form intentionally captures only first-creation fields; richer ticket-detail editing for product/order/warranty fields still needs to be added.
+- No validation beyond basic required fields.
+- No real routing despite copy ticket link behavior.
+- AI Assignment is deterministic mock fair-routing logic, not connected to real staffing, skill, shift, or capacity data.
+- No automated regression tests yet.
+
+## UI Polish Tasks
+
+- Continue confirming no horizontal scrolling at 1440x900 in normal browser windows after future layout changes.
+- Tighten top bar spacing at narrower desktop widths.
+- Improve metric card label wrapping.
+- Continue replacing remaining one-off legacy color literals with semantic Tessario variables as components are touched.
+- Continue refining attachment, macro, and ticket-action icons as those surfaces are touched.
+- Add keyboard-focus styles consistently.
+- Add loading skeletons for future async data states.
+- Keep workspace recovery available under Admin/Settings for demos and QA.
+- Make macro cards more scannable with categories and pinned markers.
+- Add better empty states for macros, attachments, and similar tickets.
+- Add a side-by-side attachment preview mode for replying.
+- Complete animation polish pass done (2026-05-09): motion variables, sidebar collapse, modal close, drawer timing, dropdown close, toast direction, row remove, button lift, tab transitions all cleaned up.
+
+## Future Backend And Integration Ideas
+
+- Real authentication and role permissions.
+- Ticket API and database persistence.
+- Email inbox/support email integration.
+- OST data import.
+- Order lookup integration.
+- Warranty registration lookup.
+- Inventory and replacement part availability.
+- Shipping/tracking integration.
+- Product knowledge base integration.
+- Review tracking integration.
+- AI ticket summarization.
+- AI similar-ticket search.
+- AI next-test suggestion.
+- AI reply draft assistance.
+- Real Tessario Assist model-provider integration.
+- Manager QA/coaching tools.
