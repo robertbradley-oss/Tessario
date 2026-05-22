@@ -26,13 +26,19 @@ The app has no package install step and no build step. It is plain HTML, CSS, Ja
 
 ## Backend MVP
 
-`server.mjs` now serves the frontend and exposes JSON API endpoints under `/api`.
+`server.mjs` now serves the frontend and exposes API endpoints under `/api`. It uses local JSON-file persistence by default and switches to Postgres when `DATABASE_URL` is set.
 
 - `GET /api/health`
 - `GET /api/session`
 - `GET /api/bootstrap`
 - `GET /api/state/:resource`
 - `PUT /api/state/:resource`
+- `GET /api/tickets`
+- `POST /api/tickets`
+- `GET /api/tickets/:id`
+- `PATCH /api/tickets/:id`
+- `POST /api/tickets/:id/messages`
+- `POST /api/tickets/:id/notes`
 - `POST /api/reset`
 
 The backend persists synced demo state to `.data/tessario-state.json`, which is intentionally ignored by Git. See `docs/backend.md` for the backend plan and next upgrades.
@@ -99,7 +105,7 @@ The important deployed files are:
 
 ## Known Issues
 
-- Backend persistence currently uses a local JSON file rather than Postgres.
+- Backend persistence uses a local JSON file unless `DATABASE_URL` is configured for Postgres.
 - Auth, email ingestion, file storage, and role permissions are not production-ready yet.
 - `localStorage` remains as a browser fallback. The app validates the saved mock-ticket schema and reseeds default data when stale data is detected.
 - Attachment previews use mock inline/modal rendering until real backend file storage and downloads exist.

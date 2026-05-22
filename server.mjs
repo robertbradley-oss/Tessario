@@ -1,12 +1,14 @@
 // Tessario local server: static app hosting plus MVP JSON API persistence.
 import { createServer } from "node:http";
-import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
-import { dirname, extname, join, normalize, resolve } from "node:path";
+import { readFile } from "node:fs/promises";
+import { extname, join, normalize, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { createJsonStore } from "./lib/json-store.mjs";
 
 const root = fileURLToPath(new URL(".", import.meta.url));
 const port = Number(process.env.PORT || 4173);
 const dataFile = process.env.TESSARIO_DATA_FILE || join(root, ".data", "tessario-state.json");
+const schemaPath = join(root, "db", "schema.sql");
 const maxJsonBytes = 12 * 1024 * 1024;
 
 const staticTypes = {
@@ -29,7 +31,7 @@ const resourceValidators = {
   lastTicketNumber: (value) => Number.isInteger(value) && value >= 0
 };
 
-let stateCache = null;
+const store = await createStore();
 
 const server = createServer(async (request, response) => {
   try {
@@ -49,6 +51,7 @@ const server = createServer(async (request, response) => {
 
 server.listen(port, "127.0.0.1", () => {
   console.log(`Tessario (iSpring Model) running at http://127.0.0.1:${port}`);
+  console.log(`Persistence: ${store.mode}`);
 });
 
 async function handleApi(request, response, url) {
@@ -57,13 +60,13 @@ async function handleApi(request, response, url) {
       ok: true,
       app: "Tessario (iSpring Model)",
       mode: "mvp-backend",
-      persistence: "json-file"
+      persistence: store.mode
     });
     return;
   }
 
   if (request.method === "GET" && url.pathname === "/api/session") {
-    const state = await loadState();
+    const state = await store.loadState();
     sendJson(response, 200, {
       user: {
         name: state.profile?.displayName || "CS14 Robert",
@@ -76,9 +79,63 @@ async function handleApi(request, response, url) {
 
   if (request.method === "GET" && url.pathname === "/api/bootstrap") {
     sendJson(response, 200, {
-      state: await loadState()
+      state: await store.loadState()
     });
     return;
+  }
+
+  if (request.method === "GET" && url.pathname === "/api/tickets") {
+    sendJson(response, 200, {
+      tickets: await store.listTickets(Object.fromEntries(url.searchParams.entries()))
+    });
+    return;
+  }
+
+  if (request.method === "POST" && url.pathname === "/api/tickets") {
+    const input = await readJsonBody(request);
+    if (!isPlainObject(input) || !String(input.subject || "").trim()) {
+      sendJson(response, 400, { error: "invalid_ticket_payload" });
+      return;
+    }
+    sendJson(response, 201, { ticket: await store.createTicket(input) });
+    return;
+  }
+
+  const ticketRoute = url.pathname.match(/^\/api\/tickets\/([^/]+)(?:\/(messages|notes))?$/);
+  if (ticketRoute) {
+    const ticketId = decodeURIComponent(ticketRoute[1]);
+    const childRoute = ticketRoute[2] || "";
+
+    if (request.method === "GET" && !childRoute) {
+      const ticket = await store.getTicket(ticketId);
+      sendJson(response, ticket ? 200 : 404, ticket ? { ticket } : { error: "ticket_not_found" });
+      return;
+    }
+
+    if (request.method === "PATCH" && !childRoute) {
+      const patch = await readJsonBody(request);
+      if (!isPlainObject(patch)) {
+        sendJson(response, 400, { error: "invalid_ticket_patch" });
+        return;
+      }
+      const ticket = await store.patchTicket(ticketId, patch);
+      sendJson(response, ticket ? 200 : 404, ticket ? { ticket } : { error: "ticket_not_found" });
+      return;
+    }
+
+    if (request.method === "POST" && (childRoute === "messages" || childRoute === "notes")) {
+      const input = await readJsonBody(request);
+      if (!isPlainObject(input) || !String(input.body || "").trim()) {
+        sendJson(response, 400, { error: "invalid_message_payload" });
+        return;
+      }
+      const result = await store.appendTicketMessage(ticketId, {
+        ...input,
+        type: childRoute === "notes" ? "note" : input.type || "rep"
+      });
+      sendJson(response, result ? 201 : 404, result || { error: "ticket_not_found" });
+      return;
+    }
   }
 
   const stateMatch = url.pathname.match(/^\/api\/state\/([A-Za-z0-9_-]+)$/);
@@ -90,8 +147,7 @@ async function handleApi(request, response, url) {
     }
 
     if (request.method === "GET") {
-      const state = await loadState();
-      sendJson(response, 200, { resource, value: state[resource] ?? null });
+      sendJson(response, 200, { resource, value: await store.getResource(resource) });
       return;
     }
 
@@ -101,19 +157,14 @@ async function handleApi(request, response, url) {
         sendJson(response, 400, { error: "invalid_resource_payload", resource });
         return;
       }
-      const state = await loadState();
-      state[resource] = value;
-      state.updatedAt = new Date().toISOString();
-      await saveState(state);
-      sendJson(response, 200, { ok: true, resource, updatedAt: state.updatedAt });
+      const updatedAt = await store.setResource(resource, value);
+      sendJson(response, 200, { ok: true, resource, updatedAt });
       return;
     }
   }
 
   if (request.method === "POST" && url.pathname === "/api/reset") {
-    stateCache = defaultState();
-    await saveState(stateCache);
-    sendJson(response, 200, { ok: true, state: stateCache });
+    sendJson(response, 200, { ok: true, state: await store.resetState() });
     return;
   }
 
@@ -144,27 +195,6 @@ async function serveStatic(response, pathname) {
   }
 }
 
-async function loadState() {
-  if (stateCache) return stateCache;
-  try {
-    const raw = await readFile(dataFile, "utf8");
-    const parsed = JSON.parse(raw);
-    stateCache = { ...defaultState(), ...parsed };
-  } catch {
-    stateCache = defaultState();
-    await saveState(stateCache);
-  }
-  return stateCache;
-}
-
-async function saveState(state) {
-  await mkdir(dirname(dataFile), { recursive: true });
-  const tmpFile = `${dataFile}.${process.pid}.tmp`;
-  await writeFile(tmpFile, `${JSON.stringify(state, null, 2)}\n`, "utf8");
-  await rename(tmpFile, dataFile);
-  stateCache = state;
-}
-
 function defaultState() {
   return {
     version: 1,
@@ -179,6 +209,18 @@ function defaultState() {
     customerAccounts: null,
     lastTicketNumber: null
   };
+}
+
+async function createStore() {
+  if (process.env.DATABASE_URL) {
+    const { createPostgresStore } = await import("./lib/postgres-store.mjs");
+    return createPostgresStore({
+      databaseUrl: process.env.DATABASE_URL,
+      schemaPath,
+      defaultState
+    });
+  }
+  return createJsonStore({ dataFile, defaultState });
 }
 
 async function readJsonBody(request) {

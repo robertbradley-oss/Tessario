@@ -32,6 +32,43 @@ try {
     throw new Error("Profile readback did not match written value.");
   }
 
+  const ticketInput = {
+    id: "SMOKE-1",
+    subject: "Smoke test ticket",
+    status: "Open",
+    customer: {
+      name: "Smoke Customer",
+      email: "smoke@example.com"
+    },
+    conversation: []
+  };
+  const created = await fetch(`http://127.0.0.1:${port}/api/tickets`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(ticketInput)
+  });
+  if (created.status !== 201) throw new Error(`Ticket create failed: ${created.status}`);
+
+  const patched = await fetch(`http://127.0.0.1:${port}/api/tickets/SMOKE-1`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ status: "Closed" })
+  });
+  if (!patched.ok) throw new Error(`Ticket patch failed: ${patched.status}`);
+
+  const note = await fetch(`http://127.0.0.1:${port}/api/tickets/SMOKE-1/notes`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ author: "Smoke Test", body: "Backend note route works." })
+  });
+  if (note.status !== 201) throw new Error(`Ticket note failed: ${note.status}`);
+
+  const ticketRead = await fetch(`http://127.0.0.1:${port}/api/tickets/SMOKE-1`);
+  const ticketPayload = await ticketRead.json();
+  if (ticketPayload.ticket?.status !== "Closed" || ticketPayload.ticket?.conversation?.length !== 1) {
+    throw new Error("Ticket normalized API readback did not match expected state.");
+  }
+
   console.log("Backend smoke test passed.");
 } finally {
   server.kill();

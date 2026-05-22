@@ -1,0 +1,42 @@
+create table if not exists app_state (
+  resource text primary key,
+  value jsonb not null,
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists tickets (
+  id text primary key,
+  ticket_number integer,
+  subject text not null default '',
+  status text not null default '',
+  priority text not null default '',
+  assignee text not null default '',
+  customer_name text not null default '',
+  customer_email text not null default '',
+  model text not null default '',
+  family text not null default '',
+  source text not null default '',
+  purchase_source text not null default '',
+  created_at timestamptz,
+  updated_at timestamptz,
+  due_at timestamptz,
+  data jsonb not null default '{}'::jsonb
+);
+
+create index if not exists tickets_status_idx on tickets (status);
+create index if not exists tickets_assignee_idx on tickets (assignee);
+create index if not exists tickets_customer_email_idx on tickets (customer_email);
+create index if not exists tickets_updated_at_idx on tickets (updated_at desc);
+
+create table if not exists ticket_messages (
+  id text primary key,
+  ticket_id text not null references tickets(id) on delete cascade,
+  message_type text not null default 'note',
+  author text not null default '',
+  body text not null default '',
+  created_at timestamptz,
+  data jsonb not null default '{}'::jsonb
+);
+
+create index if not exists ticket_messages_ticket_id_idx on ticket_messages (ticket_id);
+create index if not exists ticket_messages_created_at_idx on ticket_messages (created_at);
